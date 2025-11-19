@@ -1,0 +1,10 @@
+{
+	"id": "obsidian-todoist-sync",
+	"name": "Simple Todoist Sync",
+	"version": "0.1.0",
+	"minAppVersion": "1.0.0",
+	"description": "Bi-directional sync between Obsidian and Todoist. Sync task names and completion status automatically.",
+	"author": "erblack",
+	"authorUrl": "https://github.com/erblack",
+	"isDesktopOnly": false
+}

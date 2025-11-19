@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"target": "esnext",
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"lib": ["esnext", "DOM"],
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"noImplicitAny": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"declaration": true,
+		"noEmit": true,
+		"baseUrl": ".",
+		"allowImportingTsExtensions": true
+	},
+	"include": ["src/**/*.ts"],
+	"exclude": ["node_modules", "dist", "tests"]
+}

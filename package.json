@@ -1,0 +1,35 @@
+{
+	"name": "obsidian-todoist-sync",
+	"version": "0.1.0",
+	"description": "Simple bi-directional sync between Obsidian and Todoist",
+	"type": "module",
+	"main": "main.js",
+	"scripts": {
+		"build": "vite build",
+		"start": "vite build --watch",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"fix": "biome check --write --unsafe .",
+		"test": "vitest run",
+		"typecheck": "tsc"
+	},
+	"keywords": [
+		"obsidian",
+		"obsidian-plugin",
+		"todoist",
+		"sync",
+		"tasks"
+	],
+	"author": "erblack",
+	"license": "MIT",
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.4",
+		"@doist/todoist-api-typescript": "^6.1.4",
+		"@tanstack/query-core": "^5.90.9",
+		"@tanstack/query-persist-client-core": "^5.91.8",
+		"obsidian": "^1.7.2",
+		"typescript": "^5.7.2",
+		"vite": "^7.2.1",
+		"vitest": "^4.0.7"
+	}
+}
