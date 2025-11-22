@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { parseFileContent } from "./parse-file-content.ts";
 
 vi.mock("./task/obsidian-task-parse.ts", () => ({
@@ -10,6 +10,10 @@ import { obsidianTaskParse } from "./task/obsidian-task-parse.ts";
 const mockObsidianTaskParse = vi.mocked(obsidianTaskParse);
 
 describe("parseFileContent", () => {
+	afterEach(() => {
+		mockObsidianTaskParse.mockClear();
+	});
+
 	describe("basic task parsing", () => {
 		it("should not call obsidianTaskParse for empty content", () => {
 			parseFileContent("");

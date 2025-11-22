@@ -1,9 +1,9 @@
 {
 	"compilerOptions": {
-		"target": "esnext",
-		"module": "esnext",
-		"moduleResolution": "bundler",
-		"lib": ["esnext", "DOM"],
+		"target": "es2024",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"lib": ["ES6", "DOM"],
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
@@ -15,9 +15,9 @@
 		"noFallthroughCasesInSwitch": true,
 		"declaration": true,
 		"noEmit": true,
-		"baseUrl": ".",
-		"allowImportingTsExtensions": true
+		"allowImportingTsExtensions": true,
+		"types": ["node"]
 	},
-	"include": ["src/**/*.ts"],
-	"exclude": ["node_modules", "dist", "tests"]
+	"include": ["src"],
+	"exclude": ["node_modules"]
 }

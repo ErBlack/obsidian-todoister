@@ -5,13 +5,13 @@
 	"type": "module",
 	"main": "main.js",
 	"scripts": {
-		"build": "vite build",
-		"start": "vite build --watch",
+		"build": "node build.js",
+		"start": "node build.js --watch",
 		"lint": "biome check .",
 		"format": "biome format --write .",
 		"fix": "biome check --write --unsafe .",
 		"test": "vitest run",
-		"typecheck": "tsc"
+		"typecheck": "tsgo --noEmit"
 	},
 	"keywords": [
 		"obsidian",
@@ -27,9 +27,10 @@
 		"@doist/todoist-api-typescript": "^6.1.4",
 		"@tanstack/query-core": "^5.90.9",
 		"@tanstack/query-persist-client-core": "^5.91.8",
+		"@types/node": "^24.10.1",
+		"@typescript/native-preview": "^7.0.0-dev.20251122.1",
+		"esbuild": "^0.27.0",
 		"obsidian": "^1.7.2",
-		"typescript": "^5.7.2",
-		"vite": "^7.2.1",
-		"vitest": "^4.0.7"
+		"vitest": "^4.0.13"
 	}
 }
