@@ -1,5 +1,6 @@
 import {
 	type CurrentUser,
+	type GetProjectsResponse,
 	type Task,
 	TodoistApi,
 } from "@doist/todoist-api-typescript";
@@ -10,8 +11,13 @@ import {
 	type QueryObserverResult,
 } from "@tanstack/query-core";
 import type { Persister } from "@tanstack/query-persist-client-core";
-import type { TFile } from "obsidian";
-import { Notice, Plugin } from "obsidian";
+import {
+	type Editor,
+	type MarkdownView,
+	Notice,
+	Plugin,
+	type TFile,
+} from "obsidian";
 import { createQueryClient } from "./lib/create-query-client.ts";
 import { obsidianFetchAdapter } from "./lib/obsidian-fetch-adapter.ts";
 import {
@@ -74,6 +80,10 @@ export default class TodoisterPlugin extends Plugin {
 	#activeFileCache = new Map<string, ActiveFileCacheItem>();
 	oauthState?: string;
 	userInfoObserver?: Pick<QueryObserver<CurrentUser>, "subscribe" | "destroy">;
+	projectListObserver?: Pick<
+		QueryObserver<GetProjectsResponse>,
+		"subscribe" | "destroy"
+	>;
 	oauthCallbackResolver?: (code: string) => void;
 	oauthCallbackRejector?: (error: Error) => void;
 
@@ -100,10 +110,11 @@ export default class TodoisterPlugin extends Plugin {
 
 	async onload() {
 		await this.#loadData();
-		this.#initClient();
 		await this.#initQueryClient();
+		this.#initClient();
 
 		this.userInfoObserver = this.#createUserInfoQueryObserver();
+		this.projectListObserver = this.#createProjectListQueryObserver();
 
 		this.addSettingTab(new TodoisterSettingTab(this.app, this));
 
@@ -135,6 +146,7 @@ export default class TodoisterPlugin extends Plugin {
 
 		this.registerEvent(this.app.workspace.on("file-open", this.#onFileOpen));
 		this.registerEvent(
+			// @ts-expect-error - editor-change event exists but is not in type definitions
 			this.app.workspace.on("editor-change", this.#onEditorChange),
 		);
 
@@ -149,6 +161,7 @@ export default class TodoisterPlugin extends Plugin {
 		this.#clearActiveFileCache();
 		this.#unsubscribePersist?.();
 		this.userInfoObserver?.destroy();
+		this.projectListObserver?.destroy();
 		this.#queryClient?.clear();
 	}
 
@@ -172,6 +185,12 @@ export default class TodoisterPlugin extends Plugin {
 		} else {
 			this.todoistClient = undefined;
 		}
+
+		this.#queryClient?.setDefaultOptions({
+			queries: {
+				enabled: Boolean(this.todoistClient),
+			},
+		});
 	}
 
 	async #initQueryClient() {
@@ -194,7 +213,9 @@ export default class TodoisterPlugin extends Plugin {
 			},
 		};
 
-		const { queryClient, unsubscribe } = await createQueryClient({ persister });
+		const { queryClient, unsubscribe } = await createQueryClient({
+			persister,
+		});
 
 		this.#queryClient = queryClient;
 		this.#unsubscribePersist = unsubscribe;
@@ -203,7 +224,7 @@ export default class TodoisterPlugin extends Plugin {
 	checkRequirements(): this is this & {
 		readonly todoistClient: TodoistApi;
 	} {
-		if (!this.#data.oauthAccessToken || !this.todoistClient) {
+		if (!this.#data.oauthAccessToken) {
 			new Notice("Please connect your Todoist account in settings");
 			return false;
 		}
@@ -237,9 +258,8 @@ export default class TodoisterPlugin extends Plugin {
 	#createGetTaskQueryObserver = (id: string) =>
 		new QueryObserver(this.#queryClient, {
 			queryKey: ["task", id],
-			// biome-ignore lint/style/noNonNullAssertion: query is disabled when client is undefined
+			// biome-ignore lint/style/noNonNullAssertion: query is disabled globally when client is undefined
 			queryFn: () => this.todoistClient!.getTask(id),
-			enabled: Boolean(this.todoistClient),
 		});
 
 	#createUpdateTaskMutationObserver = (taskId: string) =>
@@ -422,18 +442,20 @@ export default class TodoisterPlugin extends Plugin {
 		}
 	};
 
-	#onEditorChange = async () => {
-		const file = this.app.workspace.getActiveFile();
+	#onEditorChange = async (editor: Editor, view: MarkdownView) => {
+		const file = view.file;
 
-		clearTimeout(this.#timeout);
+		const content = editor.getValue();
 
 		if (!file) return;
 		if (!this.#pluginIsEnabled(file)) return;
 
+		clearTimeout(this.#timeout);
+
 		this.#timeout = setTimeout(async () => {
 			this.#timeout = undefined;
 
-			const content = await this.app.vault.read(file);
+			console.log(content);
 
 			const parseResults = parseFileContent(content);
 
@@ -481,10 +503,17 @@ export default class TodoisterPlugin extends Plugin {
 
 	#createUserInfoQueryObserver() {
 		return new QueryObserver(this.#queryClient, {
-			queryKey: ["user"] as const,
-			// biome-ignore lint/style/noNonNullAssertion: query is disabled when client is undefined
+			queryKey: ["user"],
+			// biome-ignore lint/style/noNonNullAssertion: query is disabled globally when client is undefined
 			queryFn: () => this.todoistClient!.getUser(),
-			enabled: () => Boolean(this.todoistClient),
+		});
+	}
+
+	#createProjectListQueryObserver() {
+		return new QueryObserver<GetProjectsResponse>(this.#queryClient, {
+			queryKey: ["projects"],
+			// biome-ignore lint/style/noNonNullAssertion: query is disabled globally when client is undefined
+			queryFn: () => this.todoistClient!.getProjects(),
 		});
 	}
 }

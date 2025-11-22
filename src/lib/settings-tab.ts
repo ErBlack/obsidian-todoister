@@ -6,13 +6,14 @@ import { generateAuthUrl, getAccessToken, revokeAccessToken } from "./oauth.ts";
 export class TodoisterSettingTab extends PluginSettingTab {
 	plugin: TodoisterPlugin;
 	#unsubscribeFromUserInfo?: VoidFunction;
+	#unsubscribeFromProjectList?: VoidFunction;
 
 	constructor(app: App, plugin: TodoisterPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
 
-	display(): void {
+	display() {
 		const { containerEl } = this;
 
 		containerEl.empty();
@@ -26,23 +27,51 @@ export class TodoisterSettingTab extends PluginSettingTab {
 		}
 
 		new Setting(containerEl)
-			.setName("Project ID")
-			.setDesc("Todoist project ID where tasks will be created (required)")
-			.addText((text) =>
-				text
-					.setPlaceholder("Enter project ID")
-					.setValue(this.plugin.todoistProjectId)
-					.onChange((value) => {
-						this.plugin.todoistProjectId = value;
-					}),
-			);
+			.setName("Project")
+			.setDesc("Select the Todoist project where tasks will be created")
+			.addDropdown((dropdown) => {
+				dropdown.setValue(this.plugin.todoistProjectId);
+				dropdown.addOption("", "Loading projects...");
+				dropdown.setDisabled(true);
+				dropdown.onChange((value) => {
+					this.plugin.todoistProjectId = value;
+				});
+
+				this.#unsubscribeFromProjectList =
+					this.plugin.projectListObserver?.subscribe(({ status, data }) => {
+						console.log("get data", status);
+						if (status === "pending") {
+							dropdown.selectEl.empty();
+							dropdown.addOption("", "Loading projects...");
+							dropdown.setDisabled(true);
+						} else if (status === "success" && data) {
+							dropdown.selectEl.empty();
+							dropdown.addOption("", "–");
+
+							for (const { name, id } of data.results) {
+								dropdown.selectEl.createEl("option", {
+									value: id,
+									text: name,
+								});
+							}
+
+							dropdown.setValue(this.plugin.todoistProjectId);
+
+							dropdown.setDisabled(false);
+						} else if (status === "error") {
+							dropdown.selectEl.empty();
+							dropdown.addOption("", "Error loading projects");
+							dropdown.setDisabled(true);
+						}
+					});
+			});
 	}
 
-	hide(): void {
+	hide() {
 		this.#unsubscribe();
 	}
 
-	#renderConnectedState(containerEl: HTMLElement): void {
+	#renderConnectedState(containerEl: HTMLElement) {
 		const setting = new Setting(containerEl)
 			.setName("Connected Account")
 			.setDesc("Loading...");
@@ -75,12 +104,15 @@ export class TodoisterSettingTab extends PluginSettingTab {
 	#unsubscribe = () => {
 		if (this.#unsubscribeFromUserInfo) {
 			this.#unsubscribeFromUserInfo();
-
 			this.#unsubscribeFromUserInfo = undefined;
+		}
+		if (this.#unsubscribeFromProjectList) {
+			this.#unsubscribeFromProjectList();
+			this.#unsubscribeFromProjectList = undefined;
 		}
 	};
 
-	#renderDisconnectedState(containerEl: HTMLElement): void {
+	#renderDisconnectedState(containerEl: HTMLElement) {
 		this.#unsubscribe();
 
 		new Setting(containerEl)

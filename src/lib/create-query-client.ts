@@ -5,10 +5,6 @@ import {
 	persistQueryClientSubscribe,
 } from "@tanstack/query-persist-client-core";
 
-interface CreateQueryClientOptions {
-	persister: Persister;
-}
-
 const gcTime = 1000 * 60 * 60 * 24;
 const maxAge = 1000 * 60 * 60 * 24;
 const staleTime = 1000 * 60 * 5;
@@ -16,7 +12,9 @@ const retry = 3;
 
 export async function createQueryClient({
 	persister,
-}: CreateQueryClientOptions): Promise<{
+}: {
+	persister: Persister;
+}): Promise<{
 	queryClient: QueryClient;
 	unsubscribe: VoidFunction;
 }> {
@@ -26,6 +24,7 @@ export async function createQueryClient({
 				gcTime,
 				staleTime,
 				retry,
+				enabled: false, // Will be enabled on api client init
 			},
 			mutations: {
 				retry: 3,
