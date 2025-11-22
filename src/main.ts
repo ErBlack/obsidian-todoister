@@ -35,9 +35,10 @@ interface PluginData {
 }
 
 interface ActiveFileCacheItemTodoist {
-	task: ObsidianTask;
 	updatedAt?: number;
-	query: Pick<QueryObserver<Task>, "subscribe" | "destroy">;
+	query: Pick<QueryObserver<Task>, "subscribe" | "destroy"> & {
+		getCurrentResult(): QueryObserverResult<Task>;
+	};
 	updateContent: Pick<
 		MutationObserver<unknown, Error, { content: string }>,
 		"mutate"
@@ -49,7 +50,6 @@ interface ActiveFileCacheItemTodoist {
 }
 
 interface ActiveFileCacheItemObsidian {
-	task: ObsidianTask;
 	updatedAt?: number;
 	create: Pick<MutationObserver<unknown, Error, void>, "mutate">;
 }
@@ -61,7 +61,7 @@ type ActiveFileCacheItem =
 function isObsidianCacheItem(
 	item: ActiveFileCacheItem,
 ): item is ActiveFileCacheItemObsidian {
-	return isObsidianId(item.task.id);
+	return "create" in item;
 }
 
 const DEFAULT_SETTINGS: Pick<PluginData, "todoistProjectId"> = {
@@ -339,30 +339,31 @@ export default class TodoisterPlugin extends Plugin {
 			const cacheItem = this.#activeFileCache.get(task.id);
 
 			if (cacheItem) {
-				if (tasksEquals(cacheItem.task, task)) continue;
-
 				if (isObsidianCacheItem(cacheItem)) {
 					cacheItem.updatedAt = Date.now();
 				} else {
-					if (cacheItem.task.checked !== task.checked) {
-						cacheItem.toggleCheck.mutate({ checked: task.checked });
-					}
+					const { data: todoistTask } = cacheItem.query.getCurrentResult();
 
-					if (cacheItem.task.content !== task.content) {
-						cacheItem.updateContent.mutate({
-							content: task.content,
-						});
-					}
+					if (!todoistTask) continue; // should not happen, cache created on file read
 
-					cacheItem.updatedAt = undefined;
+					if (!tasksEquals(todoistTask, task)) {
+						if (todoistTask.checked !== task.checked) {
+							cacheItem.toggleCheck.mutate({ checked: task.checked });
+						}
+
+						if (todoistTask.content !== task.content) {
+							cacheItem.updateContent.mutate({
+								content: task.content,
+							});
+						}
+
+						cacheItem.updatedAt = undefined;
+					}
 				}
-
-				cacheItem.task = task;
 			} else {
 				this.#addToActiveFileCache(task.id, this.#createCacheEntry(task));
 			}
 		}
-
 		for (const [taskId] of this.#activeFileCache) {
 			if (!existedTaskIds.has(taskId)) {
 				this.#deleteFromActiveFileCache(taskId);
@@ -398,7 +399,6 @@ export default class TodoisterPlugin extends Plugin {
 		const query = this.#createGetTaskQueryObserver(task.id);
 
 		const cacheEntry: ActiveFileCacheItemTodoist = {
-			task,
 			query,
 			updateContent: this.#createUpdateTaskMutationObserver(task.id),
 			toggleCheck: this.#createSetCheckedTaskMutationObserver(task.id),
@@ -421,7 +421,6 @@ export default class TodoisterPlugin extends Plugin {
 		create.mutate();
 
 		return {
-			task,
 			create,
 		};
 	}
