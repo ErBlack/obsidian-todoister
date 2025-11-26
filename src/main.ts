@@ -149,8 +149,10 @@ export default class TodoisterPlugin extends Plugin {
 			this.app.workspace.on("editor-change", this.#onEditorChange),
 		);
 
-		const activeFile = this.app.workspace.getActiveFile();
+		this.registerDomEvent(window, "focus", this.#invalidateStale);
+		this.registerDomEvent(window, "online", this.#invalidateStale);
 
+		const activeFile = this.app.workspace.getActiveFile();
 		if (activeFile) {
 			this.#onFileOpen(activeFile);
 		}
@@ -505,15 +507,18 @@ export default class TodoisterPlugin extends Plugin {
 		clearTimeout(this.#processContentChangeTimeout);
 
 		this.#processContentChangeTimeout = setTimeout(() => {
-			console.log("edit processed");
 			if (!this.#pluginIsEnabled(info.file)) return;
 
 			this.#processContentChangeTimeout = undefined;
 
 			this.#handleContentUpdate();
 		}, 1000);
+	};
 
-		console.log(this.#processContentChangeTimeout, "timeout");
+	#invalidateStale = () => {
+		if (!this.#pluginIsEnabled(this.app.workspace.getActiveFile())) return;
+
+		this.#queryClient.invalidateQueries({ stale: true });
 	};
 
 	#onQueryUpdate = ({
