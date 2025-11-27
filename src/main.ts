@@ -27,10 +27,9 @@ import { mutationAddTask } from "./lib/query/mutation-add-task.ts";
 import { mutationSetCheckedTask } from "./lib/query/mutation-set-checked-task.ts";
 import { mutationUpdateTask } from "./lib/query/mutation-update-task.ts";
 import { queryProjectList } from "./lib/query/query-project-list.ts";
-import { queryTask, queryTaskKey } from "./lib/query/query-task.ts";
+import { queryTask } from "./lib/query/query-task.ts";
 import { queryUserInfo } from "./lib/query/query-user-info.ts";
 import { TodoisterSettingTab } from "./lib/settings-tab.ts";
-import { convertTodoistToObsidian } from "./lib/task/convert-todoist-to-obsidian.ts";
 import { isObsidianId } from "./lib/task/is-obsidian-id.ts";
 import type { ObsidianTask } from "./lib/task/obsidian-task.ts";
 import { obsidianTaskStringify } from "./lib/task/obsidian-task-stringify.ts";
@@ -44,9 +43,10 @@ interface PluginData {
 
 interface ActiveFileCacheItemTodoist {
 	updatedAt?: number;
-	query: Pick<QueryObserver<Task>, "subscribe" | "destroy"> & {
-		getCurrentResult(): QueryObserverResult<Task>;
-	};
+	query: Pick<
+		QueryObserver<ObsidianTask>,
+		"subscribe" | "destroy" | "getCurrentResult"
+	>;
 	updateContent: Pick<
 		MutationObserver<unknown, Error, { content: string }>,
 		"mutate"
@@ -145,6 +145,11 @@ export default class TodoisterPlugin extends Plugin {
 		this.registerObsidianProtocolHandler("todoister-oauth", this.#onOauth);
 
 		this.registerEvent(this.app.workspace.on("file-open", this.#onFileOpen));
+
+		this.registerEvent(
+			this.app.workspace.on("layout-change", this.#onLayoutChange),
+		);
+
 		this.registerEvent(
 			this.app.workspace.on("editor-change", this.#onEditorChange),
 		);
@@ -152,10 +157,7 @@ export default class TodoisterPlugin extends Plugin {
 		this.registerDomEvent(window, "focus", this.#invalidateStale);
 		this.registerDomEvent(window, "online", this.#invalidateStale);
 
-		const activeFile = this.app.workspace.getActiveFile();
-		if (activeFile) {
-			this.#onFileOpen(activeFile);
-		}
+		this.#onLayoutChange();
 	}
 
 	onunload() {
@@ -187,8 +189,12 @@ export default class TodoisterPlugin extends Plugin {
 			this.todoistClient = undefined;
 		}
 
-		this.#queryClient?.setDefaultOptions({
+		const defaults = this.#queryClient.getDefaultOptions();
+
+		this.#queryClient.setDefaultOptions({
+			...defaults,
 			queries: {
+				...defaults.queries,
 				enabled: Boolean(this.todoistClient),
 			},
 		});
@@ -252,7 +258,7 @@ export default class TodoisterPlugin extends Plugin {
 		});
 
 		if (enable) {
-			this.#onFileOpen(file);
+			this.#onLayoutChange();
 		} else {
 			this.#clearActiveFileCache();
 		}
@@ -372,7 +378,7 @@ export default class TodoisterPlugin extends Plugin {
 		this.#activeFileCache.delete(id);
 	}
 
-	#createCacheEntry(task: Task | ObsidianTask): ActiveFileCacheItem {
+	#createCacheEntry(task: ObsidianTask): ActiveFileCacheItem {
 		if (isObsidianId(task.id)) {
 			return this.#createObsidianCacheEntry(task);
 		} else {
@@ -387,6 +393,7 @@ export default class TodoisterPlugin extends Plugin {
 				taskId: task.id,
 				// biome-ignore lint/style/noNonNullAssertion: query is disabled globally when client is undefined
 				queryFn: () => this.todoistClient!.getTask(task.id),
+				initialData: task,
 			}),
 			updateContent: mutationUpdateTask({
 				queryClient: this.#queryClient,
@@ -407,12 +414,6 @@ export default class TodoisterPlugin extends Plugin {
 				},
 			}),
 		};
-
-		this.#queryClient.setQueryData(queryTaskKey(task.id), {
-			id: task.id,
-			content: task.content,
-			checked: task.checked,
-		});
 
 		cacheEntry.query.subscribe(this.#onQueryUpdate);
 
@@ -453,7 +454,7 @@ export default class TodoisterPlugin extends Plugin {
 
 				this.#addToActiveFileCache(
 					todoistTask.id,
-					this.#createTodoistCacheEntry(convertTodoistToObsidian(todoistTask)),
+					this.#createTodoistCacheEntry(todoistTask),
 				);
 			}
 
@@ -494,6 +495,13 @@ export default class TodoisterPlugin extends Plugin {
 	#onFileOpen = (file: TFile | null) => {
 		if (!this.#pluginIsEnabled(file)) {
 			this.#clearActiveFileCache();
+		}
+	};
+
+	#onLayoutChange = () => {
+		const file = this.app.workspace.getActiveFile();
+
+		if (!this.#pluginIsEnabled(file)) {
 			return;
 		}
 
@@ -524,7 +532,7 @@ export default class TodoisterPlugin extends Plugin {
 	#onQueryUpdate = ({
 		data: todoistTask,
 		status,
-	}: QueryObserverResult<Task>) => {
+	}: QueryObserverResult<ObsidianTask>) => {
 		if (!todoistTask || status !== "success") return;
 
 		const cacheEntry = this.#activeFileCache?.get(todoistTask.id);
@@ -535,9 +543,7 @@ export default class TodoisterPlugin extends Plugin {
 
 		if (!editor) return;
 
-		const updatedTask = obsidianTaskStringify(
-			convertTodoistToObsidian(todoistTask),
-		);
+		const updatedTask = obsidianTaskStringify(todoistTask);
 
 		const changes = parseContent(editor.getValue()).filter(
 			({ task }) =>

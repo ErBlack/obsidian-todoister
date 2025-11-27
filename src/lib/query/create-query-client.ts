@@ -7,7 +7,7 @@ import {
 
 const gcTime = 1000 * 60 * 60 * 24;
 const maxAge = 1000 * 60 * 60 * 24;
-const staleTime = 1000 * 60 * 5;
+const staleTime = 1000 * 60;
 const retry = 3;
 
 export async function createQueryClient({
