@@ -81,7 +81,7 @@ export class TodoisterSettingTab extends PluginSettingTab {
 							dropdown.selectEl.empty();
 							dropdown.addOption("", "–");
 
-							for (const { name, id } of data.results) {
+							for (const { name, id } of data) {
 								dropdown.selectEl.createEl("option", {
 									value: id,
 									text: name,

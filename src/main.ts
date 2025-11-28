@@ -1,9 +1,4 @@
-import {
-	type CurrentUser,
-	type GetProjectsResponse,
-	type Task,
-	TodoistApi,
-} from "@doist/todoist-api-typescript";
+import { type CurrentUser, TodoistApi } from "@doist/todoist-api-typescript";
 import type {
 	MutationObserver,
 	QueryClient,
@@ -14,8 +9,6 @@ import type { Persister } from "@tanstack/query-persist-client-core";
 import {
 	type Editor,
 	type EditorPosition,
-	type MarkdownFileInfo,
-	type MarkdownView,
 	Notice,
 	Plugin,
 	type TFile,
@@ -78,14 +71,14 @@ function isObsidianCacheItem(
 export default class TodoisterPlugin extends Plugin {
 	#data!: PluginData;
 	#processContentChangeTimeout?: ReturnType<typeof setTimeout>;
-	todoistClient: TodoistApi | undefined;
+	#todoistClient: TodoistApi | undefined;
 	#queryClient!: QueryClient;
 	#unsubscribePersist?: VoidFunction;
 	#activeFileCache = new Map<string, ActiveFileCacheItem>();
 	oauthState?: string;
 	userInfoObserver?: Pick<QueryObserver<CurrentUser>, "subscribe" | "destroy">;
 	projectListObserver?: Pick<
-		QueryObserver<GetProjectsResponse>,
+		QueryObserver<{ id: string; name: string }[]>,
 		"subscribe" | "destroy"
 	>;
 	oauthCallbackResolver?: (code: string) => void;
@@ -119,13 +112,11 @@ export default class TodoisterPlugin extends Plugin {
 
 		this.userInfoObserver = queryUserInfo({
 			queryClient: this.#queryClient,
-			// biome-ignore lint/style/noNonNullAssertion: query is disabled globally when client is undefined
-			queryFn: () => this.todoistClient!.getUser(),
+			queryFn: () => this.#todoistClient!.getUser(),
 		});
 		this.projectListObserver = queryProjectList({
 			queryClient: this.#queryClient,
-			// biome-ignore lint/style/noNonNullAssertion: query is disabled globally when client is undefined
-			queryFn: () => this.todoistClient!.getProjects(),
+			queryFn: () => this.#todoistClient!.getProjects(),
 		});
 
 		this.addSettingTab(new TodoisterSettingTab(this.app, this));
@@ -169,35 +160,25 @@ export default class TodoisterPlugin extends Plugin {
 	}
 
 	#saveData() {
-		this.checkRequirements();
-
 		return this.saveData(this.#data);
 	}
 
 	async #loadData() {
-		this.#data = await this.loadData();
-
-		this.checkRequirements();
+		try {
+			this.#data = (await this.loadData()) || {};
+		} catch {
+			this.#data = {};
+		}
 	}
 
 	#initClient() {
 		if (this.#data.oauthAccessToken) {
-			this.todoistClient = new TodoistApi(this.#data.oauthAccessToken, {
+			this.#todoistClient = new TodoistApi(this.#data.oauthAccessToken, {
 				customFetch: obsidianFetchAdapter,
 			});
 		} else {
-			this.todoistClient = undefined;
+			this.#todoistClient = undefined;
 		}
-
-		const defaults = this.#queryClient.getDefaultOptions();
-
-		this.#queryClient.setDefaultOptions({
-			...defaults,
-			queries: {
-				...defaults.queries,
-				enabled: Boolean(this.todoistClient),
-			},
-		});
 	}
 
 	async #initQueryClient() {
@@ -228,9 +209,7 @@ export default class TodoisterPlugin extends Plugin {
 		this.#unsubscribePersist = unsubscribe;
 	}
 
-	checkRequirements(): this is this & {
-		readonly todoistClient: TodoistApi;
-	} {
+	#checkRequirements() {
 		if (!this.#data.oauthAccessToken) {
 			new Notice("Please connect your Todoist account in settings");
 			return false;
@@ -391,27 +370,22 @@ export default class TodoisterPlugin extends Plugin {
 			query: queryTask({
 				queryClient: this.#queryClient,
 				taskId: task.id,
-				// biome-ignore lint/style/noNonNullAssertion: query is disabled globally when client is undefined
-				queryFn: () => this.todoistClient!.getTask(task.id),
+				queryFn: () => this.#todoistClient!.getTask(task.id),
 				initialData: task,
 			}),
 			updateContent: mutationUpdateTask({
 				queryClient: this.#queryClient,
 				taskId: task.id,
-				mutationFn: ({ content }) => {
-					if (!this.checkRequirements()) return Promise.reject();
-					return this.todoistClient.updateTask(task.id, { content });
-				},
+				mutationFn: ({ content }) =>
+					this.#todoistClient!.updateTask(task.id, { content }),
 			}),
 			toggleCheck: mutationSetCheckedTask({
 				queryClient: this.#queryClient,
 				taskId: task.id,
-				mutationFn: ({ checked }) => {
-					if (!this.checkRequirements()) return Promise.reject();
-					return checked
-						? this.todoistClient.closeTask(task.id)
-						: this.todoistClient.reopenTask(task.id);
-				},
+				mutationFn: ({ checked }) =>
+					checked
+						? this.#todoistClient!.closeTask(task.id)
+						: this.#todoistClient!.reopenTask(task.id),
 			}),
 		};
 
@@ -427,13 +401,11 @@ export default class TodoisterPlugin extends Plugin {
 		const add = mutationAddTask({
 			queryClient: this.#queryClient,
 			taskId: id,
-			mutationFn: (task) => {
-				if (!this.checkRequirements()) return Promise.reject();
-				return this.todoistClient.addTask({
+			mutationFn: (task) =>
+				this.#todoistClient!.addTask({
 					content: task.content,
 					projectId: this.#data.todoistProjectId,
-				});
-			},
+				}),
 		});
 
 		add.mutate(task).then((todoistTask) => {
@@ -493,29 +465,24 @@ export default class TodoisterPlugin extends Plugin {
 	};
 
 	#onFileOpen = (file: TFile | null) => {
-		if (!this.#pluginIsEnabled(file)) {
+		if (!this.#checkRequirements() || !this.#pluginIsEnabled(file)) {
 			this.#clearActiveFileCache();
 		}
 	};
 
 	#onLayoutChange = () => {
-		const file = this.app.workspace.getActiveFile();
-
-		if (!this.#pluginIsEnabled(file)) {
-			return;
-		}
+		if (!this.#pluginIsEnabled(this.app.workspace.getActiveFile())) return;
+		if (!this.#checkRequirements()) return;
 
 		this.#handleContentUpdate();
 	};
 
-	#onEditorChange = (
-		_editor: Editor,
-		info: MarkdownView | MarkdownFileInfo,
-	) => {
+	#onEditorChange = () => {
 		clearTimeout(this.#processContentChangeTimeout);
 
 		this.#processContentChangeTimeout = setTimeout(() => {
-			if (!this.#pluginIsEnabled(info.file)) return;
+			if (!this.#pluginIsEnabled(this.app.workspace.getActiveFile())) return;
+			if (!this.#checkRequirements()) return;
 
 			this.#processContentChangeTimeout = undefined;
 
@@ -533,6 +500,9 @@ export default class TodoisterPlugin extends Plugin {
 		data: todoistTask,
 		status,
 	}: QueryObserverResult<ObsidianTask>) => {
+		if (!this.#pluginIsEnabled(this.app.workspace.getActiveFile())) return;
+		if (!this.#checkRequirements()) return;
+
 		if (!todoistTask || status !== "success") return;
 
 		const cacheEntry = this.#activeFileCache?.get(todoistTask.id);

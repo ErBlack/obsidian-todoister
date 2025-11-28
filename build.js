@@ -1,5 +1,26 @@
 import esbuild from "esbuild";
 
+const todoistUploadShimPlugin = {
+	name: "todoist-upload-shim",
+	setup(build) {
+		const shimNamespace = "todoist-upload-shim";
+
+		build.onResolve({ filter: /^\.\/utils\/multipart-upload\.js$/ }, (args) => {
+			if (args.importer.includes("@doist/todoist-api-typescript")) {
+				return { path: "todoist-upload-shim", namespace: shimNamespace };
+			}
+
+			return undefined;
+		});
+
+		build.onLoad({ filter: /.*/, namespace: shimNamespace }, () => ({
+			contents:
+				'export async function uploadMultipartFile() { throw new Error("Not implemented. Please run uploads outside of Obsidian."); }',
+			loader: "ts",
+		}));
+	},
+};
+
 const isWatch = process.argv.includes("--watch");
 
 const context = await esbuild.context({
@@ -7,12 +28,13 @@ const context = await esbuild.context({
 	bundle: true,
 	format: "cjs",
 	target: "es2024",
-	platform: "node",
+	platform: "browser",
 	sourcemap: "inline",
 	minify: false,
 	outfile: "main.js",
 	external: ["obsidian", "electron", "@codemirror/*"],
 	logLevel: "info",
+	plugins: [todoistUploadShimPlugin],
 });
 
 if (isWatch) {

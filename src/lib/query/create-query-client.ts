@@ -24,7 +24,6 @@ export async function createQueryClient({
 				gcTime,
 				staleTime,
 				retry,
-				enabled: false, // Will be enabled on api client init
 			},
 			mutations: {
 				retry: 3,
