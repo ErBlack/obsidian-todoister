@@ -27,7 +27,7 @@ export function parseContent(content: string): ParseResults {
 			continue;
 		}
 
-		const taskMatch = line.match(/^(\s*)(- \[.+)$/);
+		const taskMatch = line.match(/^(\s*)([-*+] \[.+)$/);
 
 		if (!taskMatch) {
 			continue;

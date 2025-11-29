@@ -444,15 +444,17 @@ export default class TodoisterPlugin extends Plugin {
 		from: EditorPosition,
 		to: EditorPosition,
 	) {
+		const cursor = editor.getCursor();
 		editor.replaceRange(text, from, to);
+		editor.setCursor(cursor);
 		clearTimeout(this.#processContentChangeTimeout);
 	}
 
 	#handleContentUpdate = () => {
-		const editor = this.app.workspace.activeEditor?.editor;
-
+        const editor = this.app.workspace.activeEditor?.editor;
+        
 		if (!editor) return;
-
+        
 		const parseResults = parseContent(editor.getValue());
 
 		for (const { task, from, to } of parseResults.filter(

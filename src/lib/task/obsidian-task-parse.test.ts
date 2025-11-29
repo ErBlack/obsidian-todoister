@@ -161,9 +161,29 @@ describe("obsidianTaskParse", () => {
 		it("should return null for numbered list item", () => {
 			expect(obsidianTaskParse("1. [ ] Buy groceries")).toBeUndefined();
 		});
+	});
 
-		it("should return null for task with wrong dash format", () => {
-			expect(obsidianTaskParse("* [ ] Buy groceries")).toBeUndefined();
+	describe("alternative list markers", () => {
+		it("should parse task with asterisk marker", () => {
+			expect(obsidianTaskParse("* [ ] Buy groceries")).toEqual({
+				task: {
+					content: "Buy groceries",
+					checked: false,
+					id: "obsidian-test-uuid-0",
+				},
+				isNew: true,
+			});
+		});
+
+		it("should parse task with plus marker", () => {
+			expect(obsidianTaskParse("+ [ ] Buy groceries")).toEqual({
+				task: {
+					content: "Buy groceries",
+					checked: false,
+					id: "obsidian-test-uuid-0",
+				},
+				isNew: true,
+			});
 		});
 	});
 });
