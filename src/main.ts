@@ -503,13 +503,35 @@ export default class TodoisterPlugin extends Plugin {
 	#onQueryUpdate = ({
 		data: todoistTask,
 		status,
-	}: QueryObserverResult<ObsidianTask>) => {
+	}: QueryObserverResult<ObsidianTask | { deleted: true; id: string }>) => {
 		if (!this.#pluginIsEnabled(this.app.workspace.getActiveFile())) return;
 		if (!this.#checkRequirements()) return;
 
 		if (!todoistTask || status !== "success") return;
 
 		const cacheEntry = this.#activeFileCache?.get(todoistTask.id);
+
+		if ("deleted" in todoistTask) {
+			const editor = this.app.workspace.activeEditor?.editor;
+
+			if (editor) {
+				const toRemove = parseContent(editor.getValue())
+					.filter(({ task }) => task.id === todoistTask.id)
+					.sort((a, b) => b.from.line - a.from.line || b.from.ch - a.from.ch);
+
+				for (const { from } of toRemove) {
+					this.#replaceRange(
+						editor,
+						"",
+						{ line: from.line, ch: 0 },
+						{ line: from.line + 1, ch: 0 },
+					);
+				}
+			}
+
+			this.#deleteFromActiveFileCache(todoistTask.id);
+			return;
+		}
 
 		if (cacheEntry?.updatedAt) return;
 
