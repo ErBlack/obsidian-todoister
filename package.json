@@ -1,10 +1,11 @@
 {
 	"name": "obsidian-todoister-plugin",
-	"version": "0.1.0",
+	"version": "0.0.0",
 	"description": "Sync all todo from active file between Obsidian and Todoist.",
 	"type": "module",
 	"main": "main.js",
 	"scripts": {
+		"prepare": "husky",
 		"build": "node build.js",
 		"start": "node build.js --watch",
 		"lint": "biome check .",
@@ -25,12 +26,21 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.4",
 		"@doist/todoist-api-typescript": "^6.1.4",
+		"@semantic-release/changelog": "^6.0.3",
+		"@semantic-release/exec": "^7.1.0",
+		"@semantic-release/git": "^10.0.1",
 		"@tanstack/query-core": "^5.90.9",
 		"@tanstack/query-persist-client-core": "^5.91.8",
 		"@types/node": "^24.10.1",
 		"@typescript/native-preview": "^7.0.0-dev.20251122.1",
 		"esbuild": "^0.27.0",
+		"husky": "^9.1.7",
+		"lint-staged": "^15.2.10",
 		"obsidian": "^1.7.2",
+		"semantic-release": "^25.0.2",
 		"vitest": "^4.0.13"
+	},
+	"lint-staged": {
+		"*.{ts,tsx,js,jsx,json,md}": "biome check --write --no-errors-on-unmatched"
 	}
 }

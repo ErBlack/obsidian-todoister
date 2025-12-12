@@ -1,4 +1,4 @@
-import type { TodoistApi } from "@doist/todoist-api-typescript";
+import type { Task, TodoistApi } from "@doist/todoist-api-typescript";
 import { type QueryClient, QueryObserver } from "@tanstack/query-core";
 import type { ObsidianTask } from "../task/obsidian-task.ts";
 
@@ -15,13 +15,32 @@ export const queryTask = ({
 	todoistApi: () => TodoistApi;
 	initialData: ObsidianTask;
 }) =>
-	new QueryObserver(queryClient, {
+	new QueryObserver<
+		Task | ObsidianTask,
+		Error,
+		ObsidianTask | { deleted: true; id: string },
+		Task | ObsidianTask
+	>(queryClient, {
 		queryKey: queryTaskKey(taskId),
 		queryFn: () => todoistApi().getTask(taskId),
 		initialData,
-		select: ({ id, checked, content }): ObsidianTask => ({
+		select: ({
 			id,
 			checked,
 			content,
-		}),
+			...rest
+		}): ObsidianTask | { deleted: true; id: string } => {
+			if ("isDeleted" in rest && rest.isDeleted) {
+				return {
+					id,
+					deleted: true,
+				};
+			}
+
+			return {
+				id,
+				checked,
+				content,
+			};
+		},
 	});
