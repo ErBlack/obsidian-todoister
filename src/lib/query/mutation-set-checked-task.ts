@@ -1,11 +1,12 @@
 import type { TodoistApi } from "@doist/todoist-api-typescript";
 import { MutationObserver, type QueryClient } from "@tanstack/query-core";
+import type { ObsidianTask } from "../task/obsidian-task.ts";
 import { queryTaskKey } from "./query-task.ts";
 
 const mutationSetCheckedTaskKey = (taskId: string) =>
 	["set-checked", taskId] as const;
 
-export const mutationSetCheckedTask = <TData>({
+export const mutationSetCheckedTask = ({
 	queryClient,
 	taskId,
 	todoistApi,
@@ -24,8 +25,8 @@ export const mutationSetCheckedTask = <TData>({
 			queryClient.cancelQueries({
 				queryKey: queryTaskKey(taskId),
 			});
-			queryClient.setQueryData(queryTaskKey(taskId), (oldData: TData) => ({
-				...oldData,
+			queryClient.setQueryData(queryTaskKey(taskId), (task: ObsidianTask) => ({
+				...task,
 				checked,
 			}));
 		},

@@ -52,10 +52,7 @@ interface ActiveFileCacheItemTodoist {
 
 interface ActiveFileCacheItemObsidian {
 	updatedAt?: number;
-	add: Pick<
-		MutationObserver<unknown, Error, { content: string; checked: boolean }>,
-		"mutate"
-	>;
+	add: Pick<MutationObserver<unknown, Error, { content: string }>, "mutate">;
 }
 
 type ActiveFileCacheItem =
@@ -417,19 +414,24 @@ export default class TodoisterPlugin extends Plugin {
 			if (!this.#pluginIsEnabled(file)) return;
 			if (!editor) return;
 
-			const content = editor.getValue();
-			const offset = content.indexOf(id);
+			if (editor.getValue().includes(id)) {
+				let offset = editor.getValue().indexOf(id);
 
-			if (offset !== -1) {
-				const from = editor.offsetToPos(offset);
-				const to = editor.offsetToPos(offset + id.length);
+				while (offset !== -1) {
+					const from = editor.offsetToPos(offset);
+					const to = editor.offsetToPos(offset + id.length);
 
-				this.#replaceRange(editor, todoistTask.id, from, to);
+					this.#replaceRange(editor, todoistTask.id, from, to);
+
+					offset = editor.getValue().indexOf(id);
+				}
 
 				this.#addToActiveFileCache(
 					todoistTask.id,
 					this.#createTodoistCacheEntry(todoistTask),
 				);
+
+				this.#handleContentUpdate(); // If task created checked
 			}
 
 			this.#deleteFromActiveFileCache(id);

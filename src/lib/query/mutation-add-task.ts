@@ -17,13 +17,19 @@ export const mutationAddTask = ({
 }) =>
 	new MutationObserver(queryClient, {
 		mutationKey: mutationAddTaskKey(taskId),
-		mutationFn: (variables: { content: string; checked: boolean }) =>
+		mutationFn: ({ content }: { content: string }) =>
 			todoistApi().addTask({
-				content: variables.content,
+				content,
 				projectId,
 			}),
-		onSuccess: (task) => {
-			queryClient.cancelQueries({ queryKey: queryTaskKey(task.id) });
-			queryClient.setQueryData(queryTaskKey(task.id), task);
+		onSuccess: ({ id, content, checked }) => {
+			queryClient.cancelQueries({ queryKey: queryTaskKey(id) });
+			queryClient.setQueryData(
+				queryTaskKey(id),
+				{ id, content, checked },
+				{
+					updatedAt: Date.now(),
+				},
+			);
 		},
 	});
