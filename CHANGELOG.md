@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/ErBlack/obsidian-todoister/compare/obsidian-todoister-plugin-v0.1.3...obsidian-todoister-plugin-v0.2.0) (2025-12-13)
+
+
+### Features
+
+* release ([#13](https://github.com/ErBlack/obsidian-todoister/issues/13)) ([a1a2f5a](https://github.com/ErBlack/obsidian-todoister/commit/a1a2f5a1097a4fafc163a1be91397f242cb635c3))
+
 ## [0.1.3](https://github.com/ErBlack/obsidian-todoister/compare/obsidian-todoister-plugin-v0.1.2...obsidian-todoister-plugin-v0.1.3) (2025-12-13)
 
 
