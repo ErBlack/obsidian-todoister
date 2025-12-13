@@ -18,7 +18,7 @@
 		[
 			"@semantic-release/exec",
 			{
-				"prepareCmd": "jq --arg v ${nextRelease.version} '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json && npm run build"
+				"prepareCmd": "jq --arg v ${nextRelease.version} '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json && npm run build && zip -j obsidian-todoister-plugin.zip main.js manifest.json"
 			}
 		],
 		[
@@ -37,8 +37,10 @@
 			"@semantic-release/github",
 			{
 				"assets": [
-					{ "path": "main.js", "label": "main.js" },
-					{ "path": "manifest.json", "label": "manifest.json" }
+					{
+						"path": "obsidian-todoister-plugin.zip",
+						"label": "obsidian-todoister-plugin.zip"
+					}
 				]
 			}
 		]
