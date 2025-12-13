@@ -5,6 +5,7 @@
 	"type": "module",
 	"main": "main.js",
 	"scripts": {
+		"prepare": "husky",
 		"build": "node build.js",
 		"start": "node build.js --watch",
 		"lint": "biome check .",
@@ -30,7 +31,12 @@
 		"@types/node": "^24.10.1",
 		"@typescript/native-preview": "^7.0.0-dev.20251122.1",
 		"esbuild": "^0.27.0",
+		"husky": "^9.1.7",
+		"lint-staged": "^15.2.10",
 		"obsidian": "^1.7.2",
 		"vitest": "^4.0.13"
+	},
+	"lint-staged": {
+		"*.{ts,tsx,js,jsx,json,md}": "biome check --write"
 	}
 }

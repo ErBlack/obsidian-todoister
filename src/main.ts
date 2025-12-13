@@ -37,7 +37,7 @@ interface PluginData {
 interface ActiveFileCacheItemTodoist {
 	updatedAt?: number;
 	query: Pick<
-		QueryObserver<ObsidianTask>,
+		QueryObserver<ObsidianTask | { deleted: true; id: string }>,
 		"subscribe" | "destroy" | "getCurrentResult"
 	>;
 	updateContent: Pick<
@@ -320,7 +320,7 @@ export default class TodoisterPlugin extends Plugin {
 				} else {
 					const { data: todoistTask } = cacheItem.query.getCurrentResult();
 
-					if (!todoistTask) continue; // should not happen, cache created on file read
+					if (!todoistTask || "deleted" in todoistTask) continue; // should not happen, cache created on file read
 
 					if (!tasksEquals(todoistTask, task)) {
 						if (todoistTask.checked !== task.checked) {
