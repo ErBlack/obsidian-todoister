@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-todoister-plugin",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"description": "Sync all todo from active file between Obsidian and Todoist.",
 	"type": "module",
 	"main": "main.js",
