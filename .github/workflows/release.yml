@@ -23,7 +23,7 @@ jobs:
 
   publish:
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.tag_name != '' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -46,6 +46,9 @@ jobs:
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          tag_name: ${{ needs.release-please.outputs.tag_name }}
+          fail_on_unmatched_files: true
           files: |
             main.js
             manifest.json
