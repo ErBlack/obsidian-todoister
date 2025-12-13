@@ -15,7 +15,7 @@ const todoistUploadShimPlugin = {
 
 		build.onLoad({ filter: /.*/, namespace: shimNamespace }, () => ({
 			contents:
-				'export async function uploadMultipartFile() { throw new Error("Not implemented. Please run uploads outside of Obsidian."); }',
+				'export async function uploadMultipartFile() { throw new Error("Please run uploads outside of Obsidian."); }',
 			loader: "ts",
 		}));
 	},
