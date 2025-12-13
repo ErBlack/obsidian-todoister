@@ -1,9 +1,5 @@
 {
-	"packages": {
-		".": {
-			"release-type": "node",
-			"bump-minor-pre-major": true,
-			"extra-files": ["manifest.json"]
-		}
-	}
+	"release-type": "node",
+	"bump-minor-pre-major": true,
+	"extra-files": ["manifest.json"]
 }
