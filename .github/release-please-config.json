@@ -3,6 +3,7 @@
 		".": {
 			"release-type": "node",
 			"changelog-type": "github",
+			"changelog-notes-type": "github",
 			"bump-minor-pre-major": true,
 			"extra-files": ["manifest.json"]
 		}
