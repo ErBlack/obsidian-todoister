@@ -11,6 +11,8 @@ export class SyncIndicator {
 		this.#queryClient = queryClient;
 		this.#element = element;
 
+		this.#element.addEventListener("click", this.#onClick);
+
 		this.#unsubscribeQuery = this.#queryClient
 			.getQueryCache()
 			.subscribe(this.#updateElement);
@@ -24,7 +26,14 @@ export class SyncIndicator {
 	destroy() {
 		this.#unsubscribeQuery();
 		this.#unsubscribeMutation();
+		this.#element.removeEventListener("click", this.#onClick);
 	}
+
+	#onClick = () => {
+		if (this.#getStatus().status !== "idle") return;
+
+		this.#queryClient.invalidateQueries();
+	};
 
 	#getStatus() {
 		const downloadCount = this.#queryClient.isFetching();
@@ -67,7 +76,7 @@ export class SyncIndicator {
 				break;
 			case "idle":
 				setIcon(iconEl, "check");
-				this.#element.ariaLabel = "Synced";
+				this.#element.ariaLabel = "Synced. Click to resync.";
 				break;
 		}
 	};

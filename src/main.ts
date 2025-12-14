@@ -141,6 +141,12 @@ export default class TodoisterPlugin extends Plugin {
 			checkCallback: this.#onDisableSync,
 		});
 
+		this.addCommand({
+			id: "refresh-todoist-cache",
+			name: "Resync current file with Todoist",
+			callback: this.#invalidateAll,
+		});
+
 		this.registerObsidianProtocolHandler("todoister-oauth", this.#onOauth);
 
 		this.registerEvent(this.app.workspace.on("file-open", this.#onFileOpen));
@@ -500,6 +506,12 @@ export default class TodoisterPlugin extends Plugin {
 
 			this.#handleContentUpdate();
 		}, 1000);
+	};
+
+	#invalidateAll = () => {
+		if (!this.#pluginIsEnabled(this.app.workspace.getActiveFile())) return;
+
+		this.#queryClient.invalidateQueries();
 	};
 
 	#invalidateStale = () => {
