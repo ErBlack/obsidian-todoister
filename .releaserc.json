@@ -18,7 +18,7 @@
 		[
 			"@semantic-release/exec",
 			{
-				"prepareCmd": "jq --arg v ${nextRelease.version} '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json && npm run build && zip -j obsidian-todoister-plugin.zip main.js manifest.json"
+				"prepareCmd": "jq --arg v ${nextRelease.version} '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json && npm run build && zip -j obsidian-todoister-plugin.zip main.js manifest.json styles.css"
 			}
 		],
 		[
@@ -28,7 +28,8 @@
 					"package.json",
 					"package-lock.json",
 					"CHANGELOG.md",
-					"manifest.json"
+					"manifest.json",
+					"styles.css"
 				],
 				"message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
 			}

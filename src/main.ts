@@ -28,6 +28,7 @@ import { isObsidianId } from "./lib/task/is-obsidian-id.ts";
 import type { ObsidianTask } from "./lib/task/obsidian-task.ts";
 import { obsidianTaskStringify } from "./lib/task/obsidian-task-stringify.ts";
 import { tasksEquals } from "./lib/task/tasks-equals.ts";
+import { todoisterIdPlugin } from "./lib/todoister-id-plugin.ts";
 
 interface PluginData {
 	oauthAccessToken?: string;
@@ -128,6 +129,8 @@ export default class TodoisterPlugin extends Plugin {
 		});
 
 		this.addSettingTab(new TodoisterSettingTab(this.app, this));
+
+		this.registerEditorExtension(todoisterIdPlugin);
 
 		this.addCommand({
 			id: "enable-todoist-sync",
