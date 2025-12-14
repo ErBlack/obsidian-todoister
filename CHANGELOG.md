@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/ErBlack/obsidian-todoister/compare/v1.1.0...v1.2.0) (2025-12-14)
+
+
+### Features
+
+* sync indicator ([#18](https://github.com/ErBlack/obsidian-todoister/issues/18)) ([87ca95e](https://github.com/ErBlack/obsidian-todoister/commit/87ca95e48a9ed1088eea3e19b77388ca0b5b9e54))
+
 # [1.1.0](https://github.com/ErBlack/obsidian-todoister/compare/v1.0.0...v1.1.0) (2025-12-13)
 
 
