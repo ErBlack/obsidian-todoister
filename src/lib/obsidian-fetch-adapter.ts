@@ -8,8 +8,6 @@ export const obsidianFetchAdapter: CustomFetch = async (
 	url: string,
 	options?: RequestInit & { timeout?: number },
 ): Promise<CustomFetchResponse> => {
-	console.log("[Fetch Adapter] start", url);
-
 	const response = await requestUrl({
 		url,
 		method: options?.method || "GET",
@@ -17,8 +15,6 @@ export const obsidianFetchAdapter: CustomFetch = async (
 		body: options?.body as string | ArrayBuffer | undefined,
 		throw: false,
 	});
-
-	console.log("[Fetch Adapter] done");
 
 	return {
 		ok: response.status >= 200 && response.status < 300,
@@ -28,10 +24,6 @@ export const obsidianFetchAdapter: CustomFetch = async (
 		text: () => Promise.resolve(response.text),
 		json: async () => {
 			try {
-				console.log("[Fetch Adapter] JSON:", {
-					json: response.json,
-				});
-
 				return response.json;
 			} catch {
 				return {};
