@@ -30,54 +30,36 @@ export class SyncIndicator {
 	}
 
 	#onClick = () => {
-		if (this.#getStatus().status !== "idle") return;
+		if (
+			this.#queryClient.isFetching() > 0 ||
+			this.#queryClient.isMutating() > 0
+		)
+			return;
 
 		this.#queryClient.invalidateQueries();
 	};
 
-	#getStatus() {
+	#updateElement = () => {
 		const downloadCount = this.#queryClient.isFetching();
 		const uploadCount = this.#queryClient.isMutating();
 
-		if (downloadCount > 0 && uploadCount > 0) {
-			return { status: "syncing", count: downloadCount + uploadCount } as const;
-		}
-		if (downloadCount > 0) {
-			return { status: "downloading", count: downloadCount } as const;
-		}
-		if (uploadCount > 0) {
-			return { status: "uploading", count: uploadCount } as const;
-		}
-		return { status: "idle" } as const;
-	}
-
-	#updateElement = () => {
-		const { status, count } = this.#getStatus();
-
 		this.#element.empty();
 
-		const iconEl = this.#element.createSpan();
+		if (downloadCount > 0) {
+			setIcon(this.#element.createSpan({ cls: "syncing" }), "arrow-down");
+			this.#element.createSpan({ text: ` ${downloadCount}` });
+		}
 
-		switch (status) {
-			case "syncing":
-				setIcon(iconEl, "refresh-cw");
-				this.#element.createSpan({ text: ` ${count}` });
-				this.#element.ariaLabel = `Syncing ${count} tasks`;
-				break;
-			case "uploading":
-				setIcon(iconEl, "arrow-up");
-				this.#element.createSpan({ text: ` ${count}` });
-				this.#element.ariaLabel = `Uploading ${count} tasks`;
-				break;
-			case "downloading":
-				setIcon(iconEl, "arrow-down");
-				this.#element.createSpan({ text: ` ${count}` });
-				this.#element.ariaLabel = `Downloading ${count} tasks`;
-				break;
-			case "idle":
-				setIcon(iconEl, "check");
-				this.#element.ariaLabel = "Synced. Click to resync.";
-				break;
+		if (uploadCount > 0) {
+			setIcon(this.#element.createSpan({ cls: "syncing" }), "arrow-up");
+			this.#element.createSpan({ text: ` ${uploadCount}` });
+		}
+
+		if (downloadCount === 0 && uploadCount === 0) {
+			setIcon(this.#element.createSpan(), "check");
+			this.#element.ariaLabel = "Synced. Click to resync.";
+		} else {
+			this.#element.ariaLabel = "Syncing";
 		}
 	};
 }
