@@ -32,7 +32,7 @@ const context = await esbuild.context({
 	sourcemap: "inline",
 	minify: false,
 	outfile: "main.js",
-	external: ["obsidian", "electron", "@codemirror/*"],
+	external: ["obsidian", "electron", "@codemirror/*", "undici"],
 	logLevel: "info",
 	plugins: [todoistUploadShimPlugin],
 });
