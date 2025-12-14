@@ -23,6 +23,7 @@ import { queryProjectList } from "./lib/query/query-project-list.ts";
 import { queryTask } from "./lib/query/query-task.ts";
 import { queryUserInfo } from "./lib/query/query-user-info.ts";
 import { TodoisterSettingTab } from "./lib/settings-tab.ts";
+import { SyncIndicator } from "./lib/sync-indicator.ts";
 import { isObsidianId } from "./lib/task/is-obsidian-id.ts";
 import type { ObsidianTask } from "./lib/task/obsidian-task.ts";
 import { obsidianTaskStringify } from "./lib/task/obsidian-task-stringify.ts";
@@ -72,6 +73,7 @@ export default class TodoisterPlugin extends Plugin {
 	#queryClient!: QueryClient;
 	#unsubscribePersist?: VoidFunction;
 	#activeFileCache = new Map<string, ActiveFileCacheItem>();
+	#syncIndicator?: SyncIndicator;
 	#getTodoistClient = (): TodoistApi => {
 		const client = this.#todoistClient;
 
@@ -154,12 +156,18 @@ export default class TodoisterPlugin extends Plugin {
 		this.registerDomEvent(window, "focus", this.#invalidateStale);
 		this.registerDomEvent(window, "online", this.#invalidateStale);
 
+		this.#syncIndicator = new SyncIndicator(
+			this.#queryClient,
+			this.addStatusBarItem(),
+		);
+
 		this.#onLayoutChange();
 	}
 
 	onunload() {
 		this.#clearActiveFileCache();
 		this.#unsubscribePersist?.();
+		this.#syncIndicator?.destroy();
 		this.userInfoObserver?.destroy();
 		this.projectListObserver?.destroy();
 		this.#queryClient?.clear();
