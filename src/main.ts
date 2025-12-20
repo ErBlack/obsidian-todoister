@@ -465,7 +465,15 @@ export default class TodoisterPlugin extends Plugin {
 		from: EditorPosition,
 		to: EditorPosition,
 	) {
+		const cursorPos = editor.getCursor();
+		const isOnEditedLine = cursorPos.line === from.line;
+
 		editor.replaceRange(text, from, to);
+
+		if (isOnEditedLine) {
+			editor.setCursor(cursorPos);
+		}
+
 		clearTimeout(this.#processContentChangeTimeout);
 	}
 
