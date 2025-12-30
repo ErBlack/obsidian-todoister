@@ -100,6 +100,30 @@ describe("parseContent", () => {
 		});
 	});
 
+	describe("tasks inside callouts / blockquotes", () => {
+		it("should call obsidianTaskParse for tasks inside a callout (blockquote)", () => {
+			const content = ["> [!note]", "> - [ ] Callout task"].join("\n");
+
+			parseContent(content);
+
+			expect(mockObsidianTaskParse).toHaveBeenCalledTimes(1);
+			expect(mockObsidianTaskParse).toHaveBeenCalledWith("- [ ] Callout task");
+		});
+
+		it("should call obsidianTaskParse for nested blockquote tasks", () => {
+			const content = [
+				"> [!note]",
+				"> > [!info] Title here",
+				"> > - [ ] Nested task",
+			].join("\n");
+
+			parseContent(content);
+
+			expect(mockObsidianTaskParse).toHaveBeenCalledTimes(1);
+			expect(mockObsidianTaskParse).toHaveBeenCalledWith("- [ ] Nested task");
+		});
+	});
+
 	describe("non-task content", () => {
 		it("should not call obsidianTaskParse for regular text", () => {
 			parseContent("This is regular text");

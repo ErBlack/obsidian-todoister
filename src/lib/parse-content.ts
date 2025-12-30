@@ -27,21 +27,23 @@ export function parseContent(content: string): ParseResults {
 			continue;
 		}
 
-		const taskMatch = line.match(/^(\s*)([-*+] \[.+)$/);
+		// Support tasks inside blockquotes/callouts, e.g. "> - [ ] task" or "> > - [ ] task"
+		const taskMatch = line.match(/^(\s*(?:>\s*)*)(\s*)([-*+] \[.+)$/);
 
 		if (!taskMatch) {
 			continue;
 		}
 
-		const indent = taskMatch[1];
-		const taskString = taskMatch[2];
+		const quotePrefix = taskMatch[1] ?? "";
+		const indent = taskMatch[2] ?? "";
+		const taskString = taskMatch[3];
 		const parseResult = obsidianTaskParse(taskString);
 
 		if (parseResult) {
 			parseResults.push({
 				...parseResult,
 				lineNumber,
-				from: { line: lineNumber, ch: indent.length },
+				from: { line: lineNumber, ch: quotePrefix.length + indent.length },
 				to: { line: lineNumber, ch: line.length },
 			});
 		}
