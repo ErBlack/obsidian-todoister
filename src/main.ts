@@ -15,6 +15,7 @@ import {
 } from "obsidian";
 import { obsidianFetchAdapter } from "./lib/obsidian-fetch-adapter.ts";
 import { type ParseResults, parseContent } from "./lib/parse-content.ts";
+import { preventTaskSplitPlugin } from "./lib/prevent-task-split-plugin.ts";
 import { createQueryClient } from "./lib/query/create-query-client.ts";
 import { mutationAddTask } from "./lib/query/mutation-add-task.ts";
 import { mutationSetCheckedTask } from "./lib/query/mutation-set-checked-task.ts";
@@ -131,6 +132,7 @@ export default class TodoisterPlugin extends Plugin {
 		this.addSettingTab(new TodoisterSettingTab(this.app, this));
 
 		this.registerEditorExtension(todoisterIdPlugin);
+		this.registerEditorExtension(preventTaskSplitPlugin);
 
 		this.addCommand({
 			id: "enable-todoist-sync",
