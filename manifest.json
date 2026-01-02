@@ -1,7 +1,7 @@
 {
 	"id": "todoister",
 	"name": "Todoister",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"minAppVersion": "1.0.0",
 	"description": "Sync all todo from active file between Obsidian and Todoist.",
 	"author": "erblack",

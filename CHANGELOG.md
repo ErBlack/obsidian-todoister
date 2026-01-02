@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/ErBlack/obsidian-todoister/compare/v1.5.0...v1.6.0) (2026-01-02)
+
+
+### Features
+
+* Prevent splitting task by pressing Enter inside task row ([#26](https://github.com/ErBlack/obsidian-todoister/issues/26)) ([3fbf115](https://github.com/ErBlack/obsidian-todoister/commit/3fbf11591af32f8d880fcdae88c3027a1793ff17))
+
 # [1.5.0](https://github.com/ErBlack/obsidian-todoister/compare/v1.4.0...v1.5.0) (2025-12-20)
 
 
