@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/ErBlack/obsidian-todoister/compare/v1.6.0...v1.7.0) (2026-01-02)
+
+
+### Features
+
+* support syncing tasks inside callouts and blockquotes ([#25](https://github.com/ErBlack/obsidian-todoister/issues/25)) ([80a2002](https://github.com/ErBlack/obsidian-todoister/commit/80a2002ad84225bbe63f2bf80ab535652232d67d))
+
 # [1.6.0](https://github.com/ErBlack/obsidian-todoister/compare/v1.5.0...v1.6.0) (2026-01-02)
 
 
