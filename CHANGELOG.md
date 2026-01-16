@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/ErBlack/obsidian-todoister/compare/v1.7.0...v1.7.1) (2026-01-16)
+
+
+### Bug Fixes
+
+* Support sync in reading view ([#27](https://github.com/ErBlack/obsidian-todoister/issues/27)) ([391adf6](https://github.com/ErBlack/obsidian-todoister/commit/391adf65a2b0dfd8c035398303cca3a386b94d37))
+
 # [1.7.0](https://github.com/ErBlack/obsidian-todoister/compare/v1.6.0...v1.7.0) (2026-01-02)
 
 
