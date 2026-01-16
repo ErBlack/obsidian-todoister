@@ -1,4 +1,4 @@
-.cm-line:not(.cm-active) .todoister-id {
+.is-live-preview .todoister-id {
 	display: none;
 }
 

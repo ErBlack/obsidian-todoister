@@ -6,14 +6,13 @@ import type {
 	QueryObserverResult,
 } from "@tanstack/query-core";
 import type { Persister } from "@tanstack/query-persist-client-core";
+import { MarkdownView, Notice, Plugin, type TFile } from "obsidian";
 import {
-	type Editor,
-	type EditorPosition,
-	Notice,
-	Plugin,
-	type TFile,
-} from "obsidian";
+	applyReplacementsToString,
+	type ContentReplacement,
+} from "./lib/apply-replacements-to-string.ts";
 import { obsidianFetchAdapter } from "./lib/obsidian-fetch-adapter.ts";
+import { offsetToPosition } from "./lib/offset-to-position.ts";
 import { type ParseResults, parseContent } from "./lib/parse-content.ts";
 import { preventTaskSplitPlugin } from "./lib/prevent-task-split-plugin.ts";
 import { createQueryClient } from "./lib/query/create-query-client.ts";
@@ -426,31 +425,35 @@ export default class TodoisterPlugin extends Plugin {
 			projectId: this.#data.todoistProjectId!,
 		});
 
-		add.mutate(task).then((todoistTask) => {
+		add.mutate(task).then(async (todoistTask) => {
 			const file = this.app.workspace.getActiveFile();
-			const editor = this.app.workspace.activeEditor?.editor;
 
 			if (!this.#pluginIsEnabled(file)) return;
-			if (!editor) return;
 
-			if (editor.getValue().includes(id)) {
-				let offset = editor.getValue().indexOf(id);
+			const content = await this.#getFileContent(file);
 
+			if (content.includes(id)) {
+				const replacements: ContentReplacement[] = [];
+
+				let offset = content.indexOf(id);
 				while (offset !== -1) {
-					const from = editor.offsetToPos(offset);
-					const to = editor.offsetToPos(offset + id.length);
+					replacements.push({
+						from: offsetToPosition(content, offset),
+						to: offsetToPosition(content, offset + id.length),
+						text: todoistTask.id,
+					});
 
-					this.#replaceRange(editor, todoistTask.id, from, to);
-
-					offset = editor.getValue().indexOf(id);
+					offset = content.indexOf(id, offset + id.length);
 				}
+
+				await this.#applyReplacements(file, content, replacements);
 
 				this.#addToActiveFileCache(
 					todoistTask.id,
 					this.#createTodoistCacheEntry(todoistTask),
 				);
 
-				this.#handleContentUpdate(); // If task created checked
+				await this.#handleContentUpdate(); // If task created checked
 			}
 
 			this.#deleteFromActiveFileCache(id);
@@ -461,36 +464,72 @@ export default class TodoisterPlugin extends Plugin {
 		};
 	}
 
-	#replaceRange(
-		editor: Editor,
-		text: string,
-		from: EditorPosition,
-		to: EditorPosition,
-	) {
-		const cursorPos = editor.getCursor();
-		const isOnEditedLine = cursorPos.line === from.line;
-
-		editor.replaceRange(text, from, to);
-
-		if (isOnEditedLine) {
-			editor.setCursor(cursorPos);
-		}
-
-		clearTimeout(this.#processContentChangeTimeout);
-	}
-
-	#handleContentUpdate = () => {
+	async #getFileContent(file: TFile) {
 		const editor = this.app.workspace.activeEditor?.editor;
 
+		if (editor) {
+			return editor.getValue();
+		}
+
+		return this.app.vault.read(file);
+	}
+
+	async #applyReplacements(
+		file: TFile,
+		content: string,
+		replacements: ContentReplacement[],
+	) {
+		if (replacements.length === 0) return;
+
+		const editor = this.app.workspace.activeEditor?.editor;
+		const mode = this.app.workspace
+			.getActiveViewOfType(MarkdownView)
+			?.getState()?.mode;
+
+		if (editor && (mode === "live-preview" || mode === "source")) {
+			const cursor = editor.getCursor();
+			const affectsCurrentLine = replacements.some(
+				({ from }) => from.line === cursor.line,
+			);
+
+			for (const { from, to, text } of replacements) {
+				editor.replaceRange(text, from, to);
+			}
+
+			if (affectsCurrentLine) {
+				editor.setCursor(cursor);
+			}
+
+			clearTimeout(this.#processContentChangeTimeout);
+		} else {
+			const modified = applyReplacementsToString(content, replacements);
+			if (content !== modified) {
+				await this.app.vault.modify(file, modified);
+			}
+		}
+	}
+
+	#handleContentUpdate = async () => {
+		const file = this.app.workspace.getActiveFile();
+		const editor = this.app.workspace.activeEditor?.editor;
+
+		if (!this.#pluginIsEnabled(file)) return;
 		if (!editor) return;
 
-		const parseResults = parseContent(editor.getValue());
+		const content = editor.getValue();
+		const parseResults = parseContent(content);
 
-		for (const { task, from, to } of parseResults.filter(
-			({ isNew }) => isNew,
-		)) {
-			this.#replaceRange(editor, obsidianTaskStringify(task), from, to);
-		}
+		await this.#applyReplacements(
+			file,
+			content,
+			parseResults
+				.filter(({ isNew }) => isNew)
+				.map(({ task, from, to }) => ({
+					from,
+					to,
+					text: obsidianTaskStringify(task),
+				})),
+		);
 
 		this.#updateActiveFileCache(parseResults);
 	};
@@ -533,34 +572,32 @@ export default class TodoisterPlugin extends Plugin {
 		this.#queryClient.invalidateQueries({ stale: true });
 	};
 
-	#onQueryUpdate = ({
+	#onQueryUpdate = async ({
 		data: todoistTask,
 		status,
 	}: QueryObserverResult<ObsidianTask | { deleted: true; id: string }>) => {
-		if (!this.#pluginIsEnabled(this.app.workspace.getActiveFile())) return;
-		if (!this.#checkRequirements()) return;
+		const file = this.app.workspace.getActiveFile();
 
+		if (!this.#pluginIsEnabled(file)) return;
+		if (!this.#checkRequirements()) return;
 		if (!todoistTask || status !== "success") return;
 
 		const cacheEntry = this.#activeFileCache?.get(todoistTask.id);
 
 		if ("deleted" in todoistTask) {
-			const editor = this.app.workspace.activeEditor?.editor;
+			const content = await this.#getFileContent(file);
 
-			if (editor) {
-				const toRemove = parseContent(editor.getValue())
+			await this.#applyReplacements(
+				file,
+				content,
+				parseContent(content)
 					.filter(({ task }) => task.id === todoistTask.id)
-					.sort((a, b) => b.from.line - a.from.line || b.from.ch - a.from.ch);
-
-				for (const { from } of toRemove) {
-					this.#replaceRange(
-						editor,
-						"",
-						{ line: from.line, ch: 0 },
-						{ line: from.line + 1, ch: 0 },
-					);
-				}
-			}
+					.map(({ from }) => ({
+						from: { line: from.line, ch: 0 },
+						to: { line: from.line + 1, ch: 0 },
+						text: "",
+					})),
+			);
 
 			this.#deleteFromActiveFileCache(todoistTask.id);
 			return;
@@ -568,19 +605,21 @@ export default class TodoisterPlugin extends Plugin {
 
 		if (cacheEntry?.updatedAt) return;
 
-		const editor = this.app.workspace.activeEditor?.editor;
+		const content = await this.#getFileContent(file);
 
-		if (!editor) return;
-
-		const updatedTask = obsidianTaskStringify(todoistTask);
-
-		const changes = parseContent(editor.getValue()).filter(
-			({ task }) =>
-				task.id === todoistTask.id && !tasksEquals(task, todoistTask),
+		await this.#applyReplacements(
+			file,
+			content,
+			parseContent(content)
+				.filter(
+					({ task }) =>
+						task.id === todoistTask.id && !tasksEquals(task, todoistTask),
+				)
+				.map(({ from, to }) => ({
+					from,
+					to,
+					text: obsidianTaskStringify(todoistTask),
+				})),
 		);
-
-		for (const { from, to } of changes) {
-			this.#replaceRange(editor, updatedTask, from, to);
-		}
 	};
 }
