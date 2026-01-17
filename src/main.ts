@@ -94,14 +94,18 @@ export default class TodoisterPlugin extends Plugin {
 	oauthCallbackRejector?: (error: Error) => void;
 
 	get oauthAccessToken(): string | undefined {
-		return this.#data.oauthAccessToken;
+		return (
+			this.app.secretStorage.getSecret("todoister-oauth-token") || undefined
+		);
 	}
 
 	set oauthAccessToken(value: string | undefined) {
-		this.#data.oauthAccessToken = value;
-
+		if (value) {
+			this.app.secretStorage.setSecret("todoister-oauth-token", value);
+		} else {
+			this.app.secretStorage.setSecret("todoister-oauth-token", "");
+		}
 		this.#initClient();
-		this.#saveData();
 	}
 
 	get todoistProjectId(): string {
@@ -196,8 +200,8 @@ export default class TodoisterPlugin extends Plugin {
 	}
 
 	#initClient() {
-		if (this.#data.oauthAccessToken) {
-			this.#todoistClient = new TodoistApi(this.#data.oauthAccessToken, {
+		if (this.oauthAccessToken) {
+			this.#todoistClient = new TodoistApi(this.oauthAccessToken, {
 				customFetch: obsidianFetchAdapter,
 			});
 		} else {
@@ -234,7 +238,7 @@ export default class TodoisterPlugin extends Plugin {
 	}
 
 	#checkRequirements() {
-		if (!this.#data.oauthAccessToken) {
+		if (!this.oauthAccessToken) {
 			new Notice("Please connect your Todoist account in settings");
 			return false;
 		}
