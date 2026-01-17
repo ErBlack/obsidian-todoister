@@ -26,9 +26,6 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.8",
 		"@doist/todoist-api-typescript": "^6.2.1",
-		"@semantic-release/changelog": "^6.0.3",
-		"@semantic-release/exec": "^7.1.0",
-		"@semantic-release/git": "^10.0.1",
 		"@tanstack/query-core": "^5.90.12",
 		"@tanstack/query-persist-client-core": "^5.91.11",
 		"@types/node": "^24.10.4",
@@ -37,7 +34,6 @@
 		"husky": "^9.1.7",
 		"lint-staged": "^16.2.7",
 		"obsidian": "^1.11.4",
-		"semantic-release": "^25.0.2",
 		"vitest": "^4.0.15"
 	},
 	"lint-staged": {
