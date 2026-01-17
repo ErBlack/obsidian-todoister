@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/ErBlack/obsidian-todoister/compare/v1.8.0...v1.9.0) (2026-01-17)
+
+
+### Features
+
+* Move token to secret storage ([#29](https://github.com/ErBlack/obsidian-todoister/issues/29)) ([7906744](https://github.com/ErBlack/obsidian-todoister/commit/79067442f20d907b1e675074124accb3e592093b))
+
 # [1.8.0](https://github.com/ErBlack/obsidian-todoister/compare/v1.7.1...v1.8.0) (2026-01-17)
 
 
