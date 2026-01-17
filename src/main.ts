@@ -20,7 +20,7 @@ import { mutationAddTask } from "./lib/query/mutation-add-task.ts";
 import { mutationSetCheckedTask } from "./lib/query/mutation-set-checked-task.ts";
 import { mutationUpdateTask } from "./lib/query/mutation-update-task.ts";
 import { queryProjectList } from "./lib/query/query-project-list.ts";
-import { queryTask } from "./lib/query/query-task.ts";
+import { queryTask, queryTaskKey } from "./lib/query/query-task.ts";
 import { queryUserInfo } from "./lib/query/query-user-info.ts";
 import { TodoisterSettingTab } from "./lib/settings-tab.ts";
 import { SyncIndicator } from "./lib/sync-indicator.ts";
@@ -390,12 +390,15 @@ export default class TodoisterPlugin extends Plugin {
 	}
 
 	#createTodoistCacheEntry(task: ObsidianTask): ActiveFileCacheItemTodoist {
+		const existingData = this.#queryClient.getQueryData(queryTaskKey(task.id));
+
 		const cacheEntry: ActiveFileCacheItemTodoist = {
 			query: queryTask({
 				queryClient: this.#queryClient,
 				taskId: task.id,
 				todoistApi: this.#getTodoistClient,
 				initialData: task,
+				initialDataUpdatedAt: existingData ? undefined : 0,
 			}),
 			updateContent: mutationUpdateTask({
 				queryClient: this.#queryClient,
@@ -441,6 +444,7 @@ export default class TodoisterPlugin extends Plugin {
 						from: offsetToPosition(content, offset),
 						to: offsetToPosition(content, offset + id.length),
 						text: todoistTask.id,
+						preserveCursor: true,
 					});
 
 					offset = content.indexOf(id, offset + id.length);
@@ -488,15 +492,16 @@ export default class TodoisterPlugin extends Plugin {
 
 		if (editor && (mode === "live-preview" || mode === "source")) {
 			const cursor = editor.getCursor();
-			const affectsCurrentLine = replacements.some(
-				({ from }) => from.line === cursor.line,
+			const shouldPreserveCursor = replacements.some(
+				({ from, preserveCursor }) =>
+					preserveCursor && from.line === cursor.line,
 			);
 
 			for (const { from, to, text } of replacements) {
 				editor.replaceRange(text, from, to);
 			}
 
-			if (affectsCurrentLine) {
+			if (shouldPreserveCursor) {
 				editor.setCursor(cursor);
 			}
 
@@ -523,11 +528,12 @@ export default class TodoisterPlugin extends Plugin {
 			file,
 			content,
 			parseResults
-				.filter(({ isNew }) => isNew)
-				.map(({ task, from, to }) => ({
+				.filter(({ isNew, isPasted }) => isNew || isPasted)
+				.map(({ task, from, to, isNew }) => ({
 					from,
 					to,
 					text: obsidianTaskStringify(task),
+					preserveCursor: isNew,
 				})),
 		);
 

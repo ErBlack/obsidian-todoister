@@ -9,11 +9,13 @@ export const queryTask = ({
 	taskId,
 	todoistApi,
 	initialData,
+	initialDataUpdatedAt,
 }: {
 	queryClient: QueryClient;
 	taskId: string;
 	todoistApi: () => TodoistApi;
 	initialData: ObsidianTask;
+	initialDataUpdatedAt?: number;
 }) =>
 	new QueryObserver<
 		Task | ObsidianTask,
@@ -24,6 +26,7 @@ export const queryTask = ({
 		queryKey: queryTaskKey(taskId),
 		queryFn: () => todoistApi().getTask(taskId),
 		initialData,
+		initialDataUpdatedAt,
 		select: ({
 			id,
 			checked,

@@ -4,6 +4,7 @@ export interface ContentReplacement {
 	from: EditorPosition;
 	to: EditorPosition;
 	text: string;
+	preserveCursor?: boolean;
 }
 
 export function applyReplacementsToString(
