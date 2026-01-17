@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/ErBlack/obsidian-todoister/compare/v1.7.1...v1.8.0) (2026-01-17)
+
+
+### Features
+
+* paste existed todoist task url ([#28](https://github.com/ErBlack/obsidian-todoister/issues/28)) ([b744da7](https://github.com/ErBlack/obsidian-todoister/commit/b744da70b736f293fb7c29887c364fba310c904a))
+
 ## [1.7.1](https://github.com/ErBlack/obsidian-todoister/compare/v1.7.0...v1.7.1) (2026-01-16)
 
 
