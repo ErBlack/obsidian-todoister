@@ -3,7 +3,7 @@
 	"name": "Todoister",
 	"version": "1.9.1",
 	"minAppVersion": "1.11.4",
-	"description": "Sync all todo from active file between Obsidian and Todoist.",
+	"description": "Sync todos from your active file to Todoist and back.",
 	"author": "erblack",
 	"authorUrl": "https://erblack.me",
 	"isDesktopOnly": false
