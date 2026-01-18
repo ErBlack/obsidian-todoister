@@ -218,7 +218,7 @@ export default class TodoisterPlugin extends Plugin {
 				this.#data.queryCache = JSON.stringify(client);
 				await this.saveData(this.#data);
 			},
-			restoreClient: async () => {
+			restoreClient: () => {
 				if (!this.#data.queryCache) return undefined;
 				try {
 					return JSON.parse(this.#data.queryCache) as PersistedClient;
@@ -408,6 +408,7 @@ export default class TodoisterPlugin extends Plugin {
 				taskId: task.id,
 				todoistApi: this.#getTodoistClient,
 				initialData: task,
+				// If no data in persistent cache, mark as stale to refetch
 				initialDataUpdatedAt: existingData ? undefined : 0,
 			}),
 			updateContent: mutationUpdateTask({
