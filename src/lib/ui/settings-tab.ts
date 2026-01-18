@@ -1,7 +1,11 @@
 import { getAuthStateParameter } from "@doist/todoist-api-typescript";
 import { type App, Notice, PluginSettingTab, Setting } from "obsidian";
-import type TodoisterPlugin from "../main.ts";
-import { generateAuthUrl, getAccessToken, revokeAccessToken } from "./oauth.ts";
+import type TodoisterPlugin from "../../main.ts";
+import {
+	generateAuthUrl,
+	getAccessToken,
+	revokeAccessToken,
+} from "../oauth.ts";
 
 export class TodoisterSettingTab extends PluginSettingTab {
 	plugin: TodoisterPlugin;
@@ -17,8 +21,6 @@ export class TodoisterSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty();
-
-		containerEl.createEl("h2", { text: "Todoister" });
 
 		if (this.plugin.oauthAccessToken) {
 			this.#renderConnectedState(containerEl);

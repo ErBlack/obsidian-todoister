@@ -5,13 +5,13 @@ Sync todos from your active Obsidian file to Todoist and back.
 ## Features
 
 - Two-way sync between Obsidian markdown tasks and Todoist
+- Paste Todoist task URLs to import existing tasks
 - Works on desktop and mobile
 
-## Usage
+## Documentation
 
-1. Create tasks in your Obsidian file using markdown checkboxes (`- [ ] Task`)
-2. The plugin syncs them to Todoist automatically
-3. Completed tasks in Todoist sync back to Obsidian
+- [Usage](docs/usage.md)
+- [Privacy & data](docs/privacy.md)
 
 ## License
 

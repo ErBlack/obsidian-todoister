@@ -11,10 +11,11 @@ import {
 	applyReplacementsToString,
 	type ContentReplacement,
 } from "./lib/apply-replacements-to-string.ts";
+import { preventTaskSplitPlugin } from "./lib/editor-plugins/prevent-task-split-plugin.ts";
+import { todoisterIdPlugin } from "./lib/editor-plugins/todoister-id-plugin.ts";
 import { obsidianFetchAdapter } from "./lib/obsidian-fetch-adapter.ts";
 import { offsetToPosition } from "./lib/offset-to-position.ts";
 import { type ParseResults, parseContent } from "./lib/parse-content.ts";
-import { preventTaskSplitPlugin } from "./lib/prevent-task-split-plugin.ts";
 import { createQueryClient } from "./lib/query/create-query-client.ts";
 import { mutationAddTask } from "./lib/query/mutation-add-task.ts";
 import { mutationSetCheckedTask } from "./lib/query/mutation-set-checked-task.ts";
@@ -22,13 +23,12 @@ import { mutationUpdateTask } from "./lib/query/mutation-update-task.ts";
 import { queryProjectList } from "./lib/query/query-project-list.ts";
 import { queryTask, queryTaskKey } from "./lib/query/query-task.ts";
 import { queryUserInfo } from "./lib/query/query-user-info.ts";
-import { TodoisterSettingTab } from "./lib/settings-tab.ts";
-import { SyncIndicator } from "./lib/sync-indicator.ts";
 import { isObsidianId } from "./lib/task/is-obsidian-id.ts";
 import type { ObsidianTask } from "./lib/task/obsidian-task.ts";
 import { obsidianTaskStringify } from "./lib/task/obsidian-task-stringify.ts";
 import { tasksEquals } from "./lib/task/tasks-equals.ts";
-import { todoisterIdPlugin } from "./lib/todoister-id-plugin.ts";
+import { TodoisterSettingTab } from "./lib/ui/settings-tab.ts";
+import { SyncIndicator } from "./lib/ui/sync-indicator.ts";
 
 interface PluginData {
 	oauthAccessToken?: string;
