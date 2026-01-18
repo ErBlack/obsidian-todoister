@@ -19,7 +19,7 @@ export const mutationUpdateTask = ({
 		mutationKey: mutationUpdateTaskKey(taskId),
 		mutationFn: (variables: { content: string }) =>
 			todoistApi().updateTask(taskId, { content: variables.content }),
-		onMutate: async ({ content }) => {
+		onMutate: ({ content }) => {
 			void queryClient.cancelQueries({
 				queryKey: queryTaskKey(taskId),
 			});
