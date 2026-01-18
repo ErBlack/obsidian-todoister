@@ -1,3 +1,10 @@
+## [1.9.2](https://github.com/ErBlack/obsidian-todoister/compare/1.9.1...1.9.2) (2026-01-18)
+
+
+### Bug Fixes
+
+* update description in manifest ([#33](https://github.com/ErBlack/obsidian-todoister/issues/33)) ([dcd98d3](https://github.com/ErBlack/obsidian-todoister/commit/dcd98d307330a23428f3ba966f9f1001109ab430))
+
 ## [1.9.1](https://github.com/ErBlack/obsidian-todoister/compare/v1.9.0...1.9.1) (2026-01-18)
 
 
