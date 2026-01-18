@@ -1,6 +1,6 @@
 # Todoister
 
-Sync todos from your active Obsidian file to Todoist and back.
+Sync todos from your active file to Todoist and back.
 
 ## Features
 
