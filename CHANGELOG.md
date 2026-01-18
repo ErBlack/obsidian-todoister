@@ -1,3 +1,10 @@
+## [1.9.4](https://github.com/ErBlack/obsidian-todoister/compare/1.9.3...1.9.4) (2026-01-18)
+
+
+### Bug Fixes
+
+* no redundant async ([#35](https://github.com/ErBlack/obsidian-todoister/issues/35)) ([cb5c327](https://github.com/ErBlack/obsidian-todoister/commit/cb5c327c19f0282f9c536eb250adbcc7c7f56bd6))
+
 ## [1.9.3](https://github.com/ErBlack/obsidian-todoister/compare/1.9.2...1.9.3) (2026-01-18)
 
 
