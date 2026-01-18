@@ -1,3 +1,10 @@
+## [1.9.3](https://github.com/ErBlack/obsidian-todoister/compare/1.9.2...1.9.3) (2026-01-18)
+
+
+### Bug Fixes
+
+* setup and fix obsidian linter rules ([#34](https://github.com/ErBlack/obsidian-todoister/issues/34)) ([2e91774](https://github.com/ErBlack/obsidian-todoister/commit/2e91774ff3fac9c26bd78a471c216fe94dd869d2))
+
 ## [1.9.2](https://github.com/ErBlack/obsidian-todoister/compare/1.9.1...1.9.2) (2026-01-18)
 
 
