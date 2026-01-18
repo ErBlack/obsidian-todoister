@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/ErBlack/obsidian-todoister/compare/v1.9.0...1.9.1) (2026-01-18)
+
+
+### Bug Fixes
+
+* remove v from release names ([#32](https://github.com/ErBlack/obsidian-todoister/issues/32)) ([7f7e05c](https://github.com/ErBlack/obsidian-todoister/commit/7f7e05cf6241f75a7af6f485e603e2045af4f949))
+
 # [1.9.0](https://github.com/ErBlack/obsidian-todoister/compare/v1.8.0...v1.9.0) (2026-01-17)
 
 
