@@ -23,7 +23,7 @@ export const mutationAddTask = ({
 				projectId,
 			}),
 		onSuccess: ({ id, content, checked }) => {
-			queryClient.cancelQueries({ queryKey: queryTaskKey(id) });
+			void queryClient.cancelQueries({ queryKey: queryTaskKey(id) });
 			queryClient.setQueryData(
 				queryTaskKey(id),
 				{ id, content, checked },

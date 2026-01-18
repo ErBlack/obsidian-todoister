@@ -22,11 +22,11 @@ export const obsidianFetchAdapter: CustomFetch = async (
 		statusText: "",
 		headers: response.headers,
 		text: () => Promise.resolve(response.text),
-		json: async () => {
+		json: () => {
 			try {
-				return response.json;
+				return Promise.resolve(response.json);
 			} catch {
-				return {};
+				return Promise.resolve({});
 			}
 		},
 	};

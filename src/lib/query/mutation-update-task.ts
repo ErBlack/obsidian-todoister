@@ -20,7 +20,7 @@ export const mutationUpdateTask = ({
 		mutationFn: (variables: { content: string }) =>
 			todoistApi().updateTask(taskId, { content: variables.content }),
 		onMutate: async ({ content }) => {
-			queryClient.cancelQueries({
+			void queryClient.cancelQueries({
 				queryKey: queryTaskKey(taskId),
 			});
 			queryClient.setQueryData(queryTaskKey(taskId), (task: ObsidianTask) => ({

@@ -36,7 +36,7 @@ export class SyncIndicator {
 		)
 			return;
 
-		this.#queryClient.invalidateQueries();
+		void this.#queryClient.invalidateQueries();
 	};
 
 	#updateElement = () => {

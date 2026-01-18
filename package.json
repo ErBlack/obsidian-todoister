@@ -8,9 +8,9 @@
 		"prepare": "husky",
 		"build": "node build.js",
 		"start": "node build.js --watch",
-		"lint": "biome check .",
+		"lint": "biome check . && eslint .",
 		"format": "biome format --write .",
-		"fix": "biome check --write --unsafe .",
+		"fix": "biome check --write --unsafe . && eslint . --fix",
 		"test": "vitest run",
 		"typecheck": "tsgo --noEmit"
 	},
@@ -29,14 +29,17 @@
 		"@tanstack/query-core": "^5.90.12",
 		"@tanstack/query-persist-client-core": "^5.91.11",
 		"@types/node": "^24.10.4",
-		"@typescript/native-preview": "^7.0.0-dev.20251122.1",
+		"@typescript-eslint/parser": "^8.53.0",
+		"@typescript/native-preview": "^7.0.0-dev.20260118.1",
 		"esbuild": "^0.27.1",
+		"eslint": "^9.39.2",
+		"eslint-plugin-obsidianmd": "^0.1.9",
 		"husky": "^9.1.7",
-		"lint-staged": "^16.2.7",
+		"nano-staged": "^0.9.0",
 		"obsidian": "^1.11.4",
 		"vitest": "^4.0.15"
 	},
-	"lint-staged": {
+	"nano-staged": {
 		"*.{ts,tsx,js,jsx,json,md}": "biome check --write --no-errors-on-unmatched"
 	}
 }
