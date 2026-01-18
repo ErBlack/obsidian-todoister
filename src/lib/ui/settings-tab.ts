@@ -35,7 +35,7 @@ export class TodoisterSettingTab extends PluginSettingTab {
 
 	#renderConnectedState(containerEl: HTMLElement) {
 		const setting = new Setting(containerEl)
-			.setName("Connected Account")
+			.setName("Connected account")
 			.setDesc("Loading...");
 
 		this.#unsubscribeFromUserInfo = this.plugin.userInfoObserver?.subscribe(
@@ -117,7 +117,7 @@ export class TodoisterSettingTab extends PluginSettingTab {
 		this.#unsubscribe();
 
 		new Setting(containerEl)
-			.setName("Todoist Account")
+			.setName("Todoist account")
 			.setDesc("Connect your Todoist account to sync todos")
 			.addButton((button) =>
 				button.setButtonText("Connect").setCta().onClick(this.#handleConnect),

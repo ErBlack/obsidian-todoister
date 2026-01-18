@@ -5,7 +5,10 @@ import type {
 	QueryObserver,
 	QueryObserverResult,
 } from "@tanstack/query-core";
-import type { Persister } from "@tanstack/query-persist-client-core";
+import type {
+	PersistedClient,
+	Persister,
+} from "@tanstack/query-persist-client-core";
 import { MarkdownView, Notice, Plugin, type TFile } from "obsidian";
 import {
 	applyReplacementsToString,
@@ -115,7 +118,7 @@ export default class TodoisterPlugin extends Plugin {
 	set todoistProjectId(value: string) {
 		this.#data.todoistProjectId = value === "" ? undefined : value;
 
-		this.#saveData();
+		void this.#saveData();
 	}
 
 	async onload() {
@@ -193,7 +196,7 @@ export default class TodoisterPlugin extends Plugin {
 
 	async #loadData() {
 		try {
-			this.#data = (await this.loadData()) || {};
+			this.#data = ((await this.loadData()) as PluginData) || {};
 		} catch {
 			this.#data = {};
 		}
@@ -218,7 +221,7 @@ export default class TodoisterPlugin extends Plugin {
 			restoreClient: async () => {
 				if (!this.#data.queryCache) return undefined;
 				try {
-					return JSON.parse(this.#data.queryCache);
+					return JSON.parse(this.#data.queryCache) as PersistedClient;
 				} catch {
 					return undefined;
 				}
@@ -260,9 +263,12 @@ export default class TodoisterPlugin extends Plugin {
 	}
 
 	async #toggleTodoistSync(file: TFile, enable: boolean) {
-		await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
-			frontmatter.todoister = enable;
-		});
+		await this.app.fileManager.processFrontMatter(
+			file,
+			(frontmatter: { todoister?: boolean }) => {
+				frontmatter.todoister = enable;
+			},
+		);
 
 		if (enable) {
 			this.#onLayoutChange();
@@ -276,7 +282,7 @@ export default class TodoisterPlugin extends Plugin {
 		if (!file || this.#pluginIsEnabled(file)) return false;
 
 		if (!checking) {
-			this.#toggleTodoistSync(file, true);
+			void this.#toggleTodoistSync(file, true);
 		}
 		return true;
 	};
@@ -286,7 +292,7 @@ export default class TodoisterPlugin extends Plugin {
 		if (!file || !this.#pluginIsEnabled(file)) return false;
 
 		if (!checking) {
-			this.#toggleTodoistSync(file, false);
+			void this.#toggleTodoistSync(file, false);
 		}
 		return true;
 	};
@@ -346,11 +352,11 @@ export default class TodoisterPlugin extends Plugin {
 
 					if (!tasksEquals(todoistTask, task)) {
 						if (todoistTask.checked !== task.checked) {
-							cacheItem.toggleCheck.mutate({ checked: task.checked });
+							void cacheItem.toggleCheck.mutate({ checked: task.checked });
 						}
 
 						if (todoistTask.content !== task.content) {
-							cacheItem.updateContent.mutate({
+							void cacheItem.updateContent.mutate({
 								content: task.content,
 							});
 						}
@@ -416,7 +422,15 @@ export default class TodoisterPlugin extends Plugin {
 			}),
 		};
 
-		cacheEntry.query.subscribe(this.#onQueryUpdate);
+		cacheEntry.query.subscribe(
+			(
+				result: QueryObserverResult<
+					ObsidianTask | { deleted: true; id: string }
+				>,
+			) => {
+				void this.#onQueryUpdate(result);
+			},
+		);
 
 		return cacheEntry;
 	}
@@ -432,7 +446,7 @@ export default class TodoisterPlugin extends Plugin {
 			projectId: this.#data.todoistProjectId!,
 		});
 
-		add.mutate(task).then(async (todoistTask) => {
+		void add.mutate(task).then(async (todoistTask) => {
 			const file = this.app.workspace.getActiveFile();
 
 			if (!this.#pluginIsEnabled(file)) return;
@@ -554,7 +568,7 @@ export default class TodoisterPlugin extends Plugin {
 		if (!this.#pluginIsEnabled(this.app.workspace.getActiveFile())) return;
 		if (!this.#checkRequirements()) return;
 
-		this.#handleContentUpdate();
+		void this.#handleContentUpdate();
 	};
 
 	#onEditorChange = () => {
@@ -566,20 +580,20 @@ export default class TodoisterPlugin extends Plugin {
 
 			this.#processContentChangeTimeout = undefined;
 
-			this.#handleContentUpdate();
+			void this.#handleContentUpdate();
 		}, 1000);
 	};
 
 	#invalidateAll = () => {
 		if (!this.#pluginIsEnabled(this.app.workspace.getActiveFile())) return;
 
-		this.#queryClient.invalidateQueries();
+		void this.#queryClient.invalidateQueries();
 	};
 
 	#invalidateStale = () => {
 		if (!this.#pluginIsEnabled(this.app.workspace.getActiveFile())) return;
 
-		this.#queryClient.invalidateQueries({ stale: true });
+		void this.#queryClient.invalidateQueries({ stale: true });
 	};
 
 	#onQueryUpdate = async ({

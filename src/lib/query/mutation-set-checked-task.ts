@@ -22,7 +22,7 @@ export const mutationSetCheckedTask = ({
 				? todoistApi().closeTask(taskId)
 				: todoistApi().reopenTask(taskId),
 		onMutate: ({ checked }) => {
-			queryClient.cancelQueries({
+			void queryClient.cancelQueries({
 				queryKey: queryTaskKey(taskId),
 			});
 			queryClient.setQueryData(queryTaskKey(taskId), (task: ObsidianTask) => ({
