@@ -5,6 +5,6 @@
 	"minAppVersion": "1.11.4",
 	"description": "Sync all todo from active file between Obsidian and Todoist.",
 	"author": "erblack",
-	"authorUrl": "https://github.com/erblack",
+	"authorUrl": "https://erblack.me",
 	"isDesktopOnly": false
 }

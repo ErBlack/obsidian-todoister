@@ -12,6 +12,7 @@ Sync todos from your active Obsidian file to Todoist and back.
 
 - [Usage](docs/usage.md)
 - [Privacy & data](docs/privacy.md)
+- [Technical overview](docs/technical-overview.md)
 
 ## License
 
