@@ -6,9 +6,10 @@ import {
 	ViewPlugin,
 	type ViewUpdate,
 } from "@codemirror/view";
+import { TID_BLOCK_GLOBAL_REGEXP } from "../regexp.ts";
 
 const decorator = new MatchDecorator({
-	regexp: /%%\[tid::[^\]]+\]%%/g,
+	regexp: TID_BLOCK_GLOBAL_REGEXP,
 	decoration: Decoration.mark({ class: "todoister-id" }),
 });
 

@@ -1,5 +1,6 @@
 import type { EditorPosition } from "obsidian";
 import { parseTodoistUrl } from "./parse-todoist-url.ts";
+import { TASK_LINE_REGEXP, TODOIST_URL_LINE_REGEXP } from "./regexp.ts";
 import type { ObsidianTask } from "./task/obsidian-task.ts";
 import { obsidianTaskParse } from "./task/obsidian-task-parse.ts";
 
@@ -29,12 +30,10 @@ export function parseContent(content: string): ParseResults {
 			continue;
 		}
 
-		const urlMatch = line.match(
-			/^(\s*(?:>\s*)*)(\s*)(https:\/\/app\.todoist\.com\/app\/task\/.+-[^-]+)$/,
-		);
+		const urlMatch = line.match(TODOIST_URL_LINE_REGEXP);
 
 		if (urlMatch) {
-			const parsed = parseTodoistUrl(urlMatch[3]);
+			const parsed = parseTodoistUrl(urlMatch[3].trim());
 
 			if (parsed) {
 				const quotePrefix = urlMatch[1] ?? "";
@@ -51,7 +50,7 @@ export function parseContent(content: string): ParseResults {
 			}
 		}
 
-		const taskMatch = line.match(/^(\s*(?:>\s*)*)(\s*)([-*+] \[.+)$/);
+		const taskMatch = line.match(TASK_LINE_REGEXP);
 
 		if (taskMatch) {
 			const quotePrefix = taskMatch[1] ?? "";

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { parseContent } from "./parse-content.ts";
+import * as parseTodoistUrlModule from "./parse-todoist-url.ts";
 
 vi.mock("./task/obsidian-task-parse.ts", () => ({
 	obsidianTaskParse: vi.fn(),
@@ -8,10 +9,28 @@ vi.mock("./task/obsidian-task-parse.ts", () => ({
 import { obsidianTaskParse } from "./task/obsidian-task-parse.ts";
 
 const mockObsidianTaskParse = vi.mocked(obsidianTaskParse);
+const parseTodoistUrlSpy = vi.spyOn(parseTodoistUrlModule, "parseTodoistUrl");
 
 describe("parseContent", () => {
 	afterEach(() => {
 		mockObsidianTaskParse.mockClear();
+		parseTodoistUrlSpy.mockClear();
+	});
+
+	describe("todoist URL parsing", () => {
+		it("parses pasted Todoist URL with trailing whitespace", () => {
+			parseContent("https://app.todoist.com/app/task/slug-id123   ");
+			expect(parseTodoistUrlSpy).toHaveBeenCalledWith(
+				"https://app.todoist.com/app/task/slug-id123",
+			);
+		});
+
+		it("parses quoted Todoist URL with trailing whitespace", () => {
+			parseContent("> https://app.todoist.com/app/task/a-b-id   ");
+			expect(parseTodoistUrlSpy).toHaveBeenCalledWith(
+				"https://app.todoist.com/app/task/a-b-id",
+			);
+		});
 	});
 
 	describe("basic task parsing", () => {
