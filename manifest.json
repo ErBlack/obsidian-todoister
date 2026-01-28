@@ -1,7 +1,7 @@
 {
 	"id": "todoister",
 	"name": "Todoister",
-	"version": "1.9.4",
+	"version": "1.9.5",
 	"minAppVersion": "1.11.4",
 	"description": "Sync todos from your active file to Todoist and back.",
 	"author": "erblack",

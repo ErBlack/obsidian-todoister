@@ -1,3 +1,10 @@
+## [1.9.5](https://github.com/ErBlack/obsidian-todoister/compare/1.9.4...1.9.5) (2026-01-28)
+
+
+### Bug Fixes
+
+* regexp refactoring and tests ([#36](https://github.com/ErBlack/obsidian-todoister/issues/36)) ([2ec7fc4](https://github.com/ErBlack/obsidian-todoister/commit/2ec7fc4f92e71821eab0e04bfbabbe857632e337))
+
 ## [1.9.4](https://github.com/ErBlack/obsidian-todoister/compare/1.9.3...1.9.4) (2026-01-18)
 
 
