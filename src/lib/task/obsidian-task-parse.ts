@@ -1,8 +1,6 @@
+import { TASK_STRING_REGEXP } from "../regexp.ts";
 import { generateObsidianId } from "./generate-obsidian-id.ts";
 import type { ObsidianTask } from "./obsidian-task.ts";
-
-const TASK_STRING_REGEX =
-	/^[-*+] \[(?<checkbox>[ xX])\] (?<content>.+?)(?:\s*%%\[tid::(?<id>.+?)\]%%)?$/;
 
 /**
  * Parse a task string (without indent) into an ObsidianTask
@@ -12,7 +10,7 @@ const TASK_STRING_REGEX =
 export function obsidianTaskParse(
 	taskString: string,
 ): { task: ObsidianTask; isNew: boolean } | undefined {
-	const match = TASK_STRING_REGEX.exec(taskString);
+	const match = TASK_STRING_REGEXP.exec(taskString);
 	if (!match?.groups) {
 		return undefined;
 	}

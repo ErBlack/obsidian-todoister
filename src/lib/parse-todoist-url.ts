@@ -1,9 +1,9 @@
+import { TODOIST_URL_REGEXP } from "./regexp.ts";
+
 export function parseTodoistUrl(
 	url: string,
 ): { id: string; slug: string } | null {
-	const match = /^https:\/\/app\.todoist\.com\/app\/task\/(.+)-([^-]+)$/.exec(
-		url,
-	);
+	const match = TODOIST_URL_REGEXP.exec(url);
 	if (!match) return null;
 
 	return {
