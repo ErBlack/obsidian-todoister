@@ -1,3 +1,10 @@
+## [1.9.6](https://github.com/ErBlack/obsidian-todoister/compare/1.9.5...1.9.6) (2026-02-28)
+
+
+### Bug Fixes
+
+* upgrade ([#38](https://github.com/ErBlack/obsidian-todoister/issues/38)) ([3617f95](https://github.com/ErBlack/obsidian-todoister/commit/3617f952c8a443e04dce9f18a632e49f96338cc2))
+
 ## [1.9.5](https://github.com/ErBlack/obsidian-todoister/compare/1.9.4...1.9.5) (2026-01-28)
 
 
