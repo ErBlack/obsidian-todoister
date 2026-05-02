@@ -72,7 +72,7 @@ function isObsidianCacheItem(
 
 export default class TodoisterPlugin extends Plugin {
 	#data!: PluginData;
-	#processContentChangeTimeout?: ReturnType<typeof setTimeout>;
+	#processContentChangeTimeout?: number;
 	#todoistClient: TodoistApi | undefined;
 	#queryClient!: QueryClient;
 	#unsubscribePersist?: VoidFunction;
@@ -524,7 +524,7 @@ export default class TodoisterPlugin extends Plugin {
 				editor.setCursor(cursor);
 			}
 
-			clearTimeout(this.#processContentChangeTimeout);
+			activeWindow.clearTimeout(this.#processContentChangeTimeout);
 		} else {
 			const modified = applyReplacementsToString(content, replacements);
 			if (content !== modified) {
@@ -573,9 +573,9 @@ export default class TodoisterPlugin extends Plugin {
 	};
 
 	#onEditorChange = () => {
-		clearTimeout(this.#processContentChangeTimeout);
+		activeWindow.clearTimeout(this.#processContentChangeTimeout);
 
-		this.#processContentChangeTimeout = setTimeout(() => {
+		this.#processContentChangeTimeout = activeWindow.setTimeout(() => {
 			if (!this.#pluginIsEnabled(this.app.workspace.getActiveFile())) return;
 			if (!this.#checkRequirements()) return;
 

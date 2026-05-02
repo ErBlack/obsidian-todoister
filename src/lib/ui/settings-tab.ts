@@ -130,7 +130,7 @@ export class TodoisterSettingTab extends PluginSettingTab {
 
 			this.plugin.oauthState = state;
 
-			const timeoutId = setTimeout(() => {
+			const timeoutId = activeWindow.setTimeout(() => {
 				this.plugin.oauthCallbackRejector?.(
 					new Error("OAuth timeout - no response received"),
 				);
@@ -138,15 +138,15 @@ export class TodoisterSettingTab extends PluginSettingTab {
 
 			const code = await new Promise<string>((resolve, reject) => {
 				this.plugin.oauthCallbackResolver = (code: string) => {
-					clearTimeout(timeoutId);
+					activeWindow.clearTimeout(timeoutId);
 					resolve(code);
 				};
 				this.plugin.oauthCallbackRejector = (error: Error) => {
-					clearTimeout(timeoutId);
+					activeWindow.clearTimeout(timeoutId);
 					reject(error);
 				};
 
-				Object.assign(document.createElement("a"), {
+				Object.assign(activeDocument.createEl("a"), {
 					href: generateAuthUrl(state),
 				}).click();
 			});
