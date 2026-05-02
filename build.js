@@ -5,8 +5,8 @@ const todoistUploadShimPlugin = {
 	setup(build) {
 		const shimNamespace = "todoist-upload-shim";
 
-		build.onResolve({ filter: /^\.\/utils\/multipart-upload\.js$/ }, (args) => {
-			if (args.importer.includes("@doist/todoist-api-typescript")) {
+		build.onResolve({ filter: /multipart-upload\.js$/ }, (args) => {
+			if (args.importer.includes("@doist/todoist-sdk")) {
 				return { path: "todoist-upload-shim", namespace: shimNamespace };
 			}
 

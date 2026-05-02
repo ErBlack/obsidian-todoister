@@ -24,20 +24,20 @@
 	"author": "erblack",
 	"license": "MIT",
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.4",
-		"@doist/todoist-api-typescript": "^6.2.1",
+		"@biomejs/biome": "^2.4.7",
+		"@doist/todoist-api-typescript": "^7.1.0",
 		"@tanstack/query-core": "^5.90.12",
-		"@tanstack/query-persist-client-core": "^5.91.11",
+		"@tanstack/query-persist-client-core": "^5.92.1",
 		"@types/node": "^24.10.4",
-		"@typescript-eslint/parser": "^8.53.0",
-		"@typescript/native-preview": "^7.0.0-dev.20260118.1",
-		"esbuild": "^0.27.1",
-		"eslint": "^10.0.2",
-		"eslint-plugin-obsidianmd": "^0.1.9",
+		"@typescript-eslint/parser": "^8.57.0",
+		"@typescript/native-preview": "^7.0.0-dev.20260314.1",
+		"esbuild": "^0.28.0",
+		"eslint": "^10.0.3",
+		"eslint-plugin-obsidianmd": "^0.2.9",
 		"husky": "^9.1.7",
-		"nano-staged": "^0.9.0",
+		"nano-staged": "^1.0.2",
 		"obsidian": "^1.11.4",
-		"vitest": "^4.0.15"
+		"vitest": "^4.1.0"
 	},
 	"nano-staged": {
 		"*.{ts,tsx,js,jsx,json,md}": "biome check --write --no-errors-on-unmatched"
