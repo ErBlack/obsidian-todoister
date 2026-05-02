@@ -1,3 +1,10 @@
+## [1.9.7](https://github.com/ErBlack/obsidian-todoister/compare/1.9.6...1.9.7) (2026-05-02)
+
+
+### Bug Fixes
+
+* upgrade deps ([c888b75](https://github.com/ErBlack/obsidian-todoister/commit/c888b758a13e83333bc49a3259c626e3129b3ba6))
+
 ## [1.9.6](https://github.com/ErBlack/obsidian-todoister/compare/1.9.5...1.9.6) (2026-02-28)
 
 
