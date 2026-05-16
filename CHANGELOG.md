@@ -1,3 +1,11 @@
+## [1.9.8](https://github.com/ErBlack/obsidian-todoister/compare/1.9.7...1.9.8) (2026-05-16)
+
+
+### Bug Fixes
+
+* add build provenance attestation to release workflow ([ae7ae59](https://github.com/ErBlack/obsidian-todoister/commit/ae7ae592ad89da1125c27589bf7868d5b3d3c385))
+* upgrade deps ([6fd50ee](https://github.com/ErBlack/obsidian-todoister/commit/6fd50ee1d5ad5a831034c936b0a69ef9d77da756))
+
 ## [1.9.7](https://github.com/ErBlack/obsidian-todoister/compare/1.9.6...1.9.7) (2026-05-02)
 
 
