@@ -1,10 +1,10 @@
+import { defineConfig } from "eslint/config";
 import obsidianmd from "eslint-plugin-obsidianmd";
 import globals from "globals";
-import tseslint from "typescript-eslint";
 
-export default tseslint.config(
+export default defineConfig(
 	{
-		ignores: ["node_modules/**", "main.js", "build.js", "**/*.js"],
+		ignores: ["node_modules/**", "main.js", "build.js"],
 	},
 	{
 		languageOptions: {
@@ -26,7 +26,6 @@ export default tseslint.config(
 			obsidianmd,
 		},
 		rules: {
-			"import/no-extraneous-dependencies": "off",
 			"obsidianmd/ui/sentence-case": [
 				"error",
 				{ enforceCamelCaseLower: true, brands: ["Todoist"] },

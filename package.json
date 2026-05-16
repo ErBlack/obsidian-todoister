@@ -25,11 +25,12 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.7",
+		"@codemirror/state": "^6.5.0",
+		"@codemirror/view": "^6.38.6",
 		"@doist/todoist-api-typescript": "^7.1.0",
 		"@tanstack/query-core": "^5.90.12",
 		"@tanstack/query-persist-client-core": "^5.92.1",
 		"@types/node": "^24.10.4",
-		"@typescript-eslint/parser": "^8.57.0",
 		"@typescript/native-preview": "^7.0.0-dev.20260314.1",
 		"esbuild": "^0.28.0",
 		"eslint": "^10.0.3",
