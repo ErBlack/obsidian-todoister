@@ -158,8 +158,10 @@ export class TodoisterSettingTab extends PluginSettingTab {
 			this.display();
 
 			new Notice("Successfully connected to Todoist!");
-		} catch {
-			new Notice("Failed to connect to Todoist. Please try again.");
+		} catch (error) {
+			new Notice(
+				`Failed to connect to Todoist: ${error instanceof Error ? error.message : String(error)}`,
+			);
 		}
 	};
 }
