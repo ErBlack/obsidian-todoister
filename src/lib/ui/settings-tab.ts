@@ -146,9 +146,7 @@ export class TodoisterSettingTab extends PluginSettingTab {
 					reject(error);
 				};
 
-				Object.assign(activeDocument.createEl("a"), {
-					href: generateAuthUrl(state),
-				}).click();
+				activeWindow.open(generateAuthUrl(state));
 			});
 
 			const { accessToken } = await getAccessToken(code);
