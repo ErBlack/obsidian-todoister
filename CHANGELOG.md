@@ -1,3 +1,10 @@
+## [1.9.9](https://github.com/ErBlack/obsidian-todoister/compare/1.9.8...1.9.9) (2026-05-24)
+
+
+### Bug Fixes
+
+* display error message when todoist connect faled ([1d95080](https://github.com/ErBlack/obsidian-todoister/commit/1d950806e4053c79420e02e374f9e86d33963f3e))
+
 ## [1.9.8](https://github.com/ErBlack/obsidian-todoister/compare/1.9.7...1.9.8) (2026-05-16)
 
 
