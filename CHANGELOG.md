@@ -1,3 +1,10 @@
+## [1.9.10](https://github.com/ErBlack/obsidian-todoister/compare/1.9.9...1.9.10) (2026-05-24)
+
+
+### Bug Fixes
+
+* use activeWindow.open to open auth url ([01b2fb1](https://github.com/ErBlack/obsidian-todoister/commit/01b2fb1b43004b3e9762f723c2e35ade27b84b16))
+
 ## [1.9.9](https://github.com/ErBlack/obsidian-todoister/compare/1.9.8...1.9.9) (2026-05-24)
 
 
