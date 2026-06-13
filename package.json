@@ -32,7 +32,7 @@
 		"@tanstack/query-persist-client-core": "^5.92.1",
 		"@types/node": "^24.10.4",
 		"@typescript/native-preview": "^7.0.0-dev.20260314.1",
-		"esbuild": "^0.28.0",
+		"esbuild": "^0.28.1",
 		"eslint": "^10.0.3",
 		"eslint-plugin-obsidianmd": "^0.2.9",
 		"husky": "^9.1.7",
